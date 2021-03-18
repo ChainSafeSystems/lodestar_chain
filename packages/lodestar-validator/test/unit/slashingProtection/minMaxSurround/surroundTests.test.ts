@@ -212,7 +212,7 @@ describe("surroundTests", () => {
         try {
           await minMaxSurround.assertNoSurround(emptyPubkey, {source: sourceEpoch, target: targetEpoch});
           throw Error("Should slash");
-        } catch (e) {
+        } catch (e: unknown) {
           if (e instanceof SurroundAttestationError) {
             if (slashableEpoch) {
               expect(e.type.att2Target).to.equal(slashableEpoch, "Wrong slashableEpoch");

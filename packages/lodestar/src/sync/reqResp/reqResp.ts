@@ -85,7 +85,7 @@ export class BeaconReqRespHandler implements IReqRespHandler {
         .map(async (peer) => {
           try {
             await this.goodbye(peer.id, GoodByeReasonCode.CLIENT_SHUTDOWN);
-          } catch (e) {
+          } catch (e: unknown) {
             this.logger.verbose("Failed to send goodbye", {error: e.message});
           }
         })
@@ -125,7 +125,7 @@ export class BeaconReqRespHandler implements IReqRespHandler {
   private async *onStatus(status: phase0.Status, peerId: PeerId): AsyncIterable<phase0.Status> {
     try {
       assertPeerRelevance(status, this.chain, this.config);
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.debug("Irrelevant peer", {
         peer: peerId.toB58String(),
         reason: e instanceof LodestarError ? e.getMetadata() : e.message,
@@ -178,7 +178,7 @@ export class BeaconReqRespHandler implements IReqRespHandler {
       const request = this.chain.getStatus();
       try {
         this.network.peerMetadata.status.set(peerId, await this.network.reqResp.status(peerId, request));
-      } catch (e) {
+      } catch (e: unknown) {
         this.logger.verbose("Failed to get peer latest status and metadata", {
           peerId: peerId.toB58String(),
           error: e.message,

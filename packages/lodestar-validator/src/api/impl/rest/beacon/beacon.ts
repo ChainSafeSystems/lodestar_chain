@@ -30,7 +30,7 @@ export class RestBeaconApi implements IBeaconApi {
     try {
       const genesisResponse = await this.clientV2.get<{data: Json}>("/genesis");
       return this.config.types.phase0.Genesis.fromJson(genesisResponse.data, {case: "snake"});
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error("Failed to obtain genesis time", {error: e.message});
       return null;
     }

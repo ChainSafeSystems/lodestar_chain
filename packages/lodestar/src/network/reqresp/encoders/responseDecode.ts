@@ -93,7 +93,7 @@ export async function readErrorMessage(bufferedSource: BufferedSource): Promise<
     const bytes = buffer.slice();
     try {
       return decodeErrorMessage(bytes);
-    } catch (e) {
+    } catch (e: unknown) {
       return bytes.toString("hex");
     }
   }

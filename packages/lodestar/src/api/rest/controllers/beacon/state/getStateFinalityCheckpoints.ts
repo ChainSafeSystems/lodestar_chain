@@ -29,7 +29,7 @@ export const getStateFinalityCheckpoints: ApiController<DefaultQuery, Params> = 
           finalized: this.config.types.phase0.Checkpoint.toJson(state.finalizedCheckpoint, {case: "snake"}),
         },
       });
-    } catch (e) {
+    } catch (e: unknown) {
       if (e.message === "Invalid state id") {
         throw toRestValidationError("state_id", e.message);
       }

@@ -36,7 +36,7 @@ function wrapHandler<
     try {
       await handler(...args);
       emitter.emit(event, ...((args as unknown) as ListenerType<Callback>));
-    } catch (e) {
+    } catch (e: unknown) {
       logger.error("Error handling event", {event}, e);
     }
   };

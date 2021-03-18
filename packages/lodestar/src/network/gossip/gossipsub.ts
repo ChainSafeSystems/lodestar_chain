@@ -133,7 +133,7 @@ export class Eth2Gossipsub extends Gossipsub {
       // Lodestar ObjectValidatorFns rely on these properties being set
       message.gossipObject = gossipObject;
       message.gossipTopic = gossipTopic;
-    } catch (e) {
+    } catch (e: unknown) {
       const err = new GossipValidationError(ERR_TOPIC_VALIDATOR_REJECT);
       // must set gossip scores manually, since this usually happens in super.validate
       this.score.rejectMessage(message, err.code);

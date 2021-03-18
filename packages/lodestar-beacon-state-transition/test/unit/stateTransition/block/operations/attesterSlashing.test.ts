@@ -43,7 +43,7 @@ describe("process block - attester slashings", function () {
     try {
       phase0.processAttesterSlashing(config, state, attesterSlashing, true);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(validateIndexedAttestationStub.callCount).equals(1);
       expect(
         validateIndexedAttestationStub.getCall(0).calledWithExactly(config, state, attesterSlashing.attestation1, true)
@@ -62,7 +62,7 @@ describe("process block - attester slashings", function () {
     try {
       phase0.processAttesterSlashing(config, state, attesterSlashing);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(validateIndexedAttestationStub.calledOnce).to.be.true;
     }
   });
@@ -77,7 +77,7 @@ describe("process block - attester slashings", function () {
     try {
       phase0.processAttesterSlashing(config, state, attesterSlashing);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(validateIndexedAttestationStub.calledTwice).to.be.true;
     }
   });

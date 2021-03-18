@@ -57,7 +57,7 @@ export class JobQueue {
       try {
         const result = await job();
         resolve(result);
-      } catch (e) {
+      } catch (e: unknown) {
         reject(e);
       } finally {
         this.opts.onJobDone?.({ms: Date.now() - start});

@@ -35,14 +35,14 @@ describe("process epoch - crosslinks", function () {
     try {
       processEpoch(config, generateState({slot: GENESIS_SLOT}));
       expect.fail();
-    } catch (e) {}
+    } catch (e: unknown) {}
   });
 
   it("should fail to process - not epoch", function () {
     try {
       processEpoch(config, generateState({slot: 1}));
       expect.fail();
-    } catch (e) {}
+    } catch (e: unknown) {}
   });
 
   it("should process epoch", function () {

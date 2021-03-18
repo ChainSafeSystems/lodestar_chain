@@ -67,7 +67,7 @@ export class ValidatorDir {
 
     try {
       lockFile.lockSync(this.lockfilePath);
-    } catch (e) {
+    } catch (e: unknown) {
       if (options && options.force) {
         // Ignore error, maybe log?
       } else {

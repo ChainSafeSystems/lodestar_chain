@@ -9,7 +9,7 @@ export const submitVoluntaryExit: ApiController = {
     let exit: phase0.SignedVoluntaryExit;
     try {
       exit = this.config.types.phase0.SignedVoluntaryExit.fromJson(req.body, {case: "snake"});
-    } catch (e) {
+    } catch (e: unknown) {
       throw new ValidationError("Failed to deserialize voluntary exit");
     }
     await this.api.beacon.pool.submitVoluntaryExit(exit);

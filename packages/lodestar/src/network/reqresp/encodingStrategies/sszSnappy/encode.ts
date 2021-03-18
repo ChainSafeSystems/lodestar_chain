@@ -43,7 +43,7 @@ function serializeSszBody<T extends RequestOrResponseBody>(body: T, type: Reques
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const bytes = type.serialize(body as any);
     return Buffer.from(bytes.buffer, bytes.byteOffset, bytes.length);
-  } catch (e) {
+  } catch (e: unknown) {
     throw new SszSnappyError({code: SszSnappyErrorCode.SERIALIZE_ERROR, serializeError: e});
   }
 }

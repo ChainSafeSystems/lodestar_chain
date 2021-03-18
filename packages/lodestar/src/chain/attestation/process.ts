@@ -28,7 +28,7 @@ export async function processAttestation({
   let targetState;
   try {
     targetState = await regen.getCheckpointState(target);
-  } catch (e) {
+  } catch (e: unknown) {
     throw new AttestationError({
       code: AttestationErrorCode.TARGET_STATE_MISSING,
       job,
@@ -38,7 +38,7 @@ export async function processAttestation({
   let indexedAttestation;
   try {
     indexedAttestation = targetState.epochCtx.getIndexedAttestation(attestation);
-  } catch (e) {
+  } catch (e: unknown) {
     throw new AttestationError({
       code: AttestationErrorCode.NO_COMMITTEE_FOR_SLOT_AND_INDEX,
       slot: attestation.data.slot,

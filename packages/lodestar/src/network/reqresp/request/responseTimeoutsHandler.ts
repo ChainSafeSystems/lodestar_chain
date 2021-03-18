@@ -51,7 +51,7 @@ export function responseTimeoutsHandler<T>(
           restartRespTimeout();
         })
       );
-    } catch (e) {
+    } catch (e: unknown) {
       // Rethrow error properly typed so the peer score can pick it up
       switch (e.message) {
         case RequestErrorCode.TTFB_TIMEOUT:

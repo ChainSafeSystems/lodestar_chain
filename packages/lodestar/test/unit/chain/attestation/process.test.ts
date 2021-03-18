@@ -39,7 +39,7 @@ describe("processAttestation", function () {
         job: {attestation, validSignature: false},
       });
       expect.fail("attestation should throw");
-    } catch (e) {
+    } catch (e: unknown) {
       expect(e.type.code).to.equal(AttestationErrorCode.TARGET_STATE_MISSING);
     }
   });
@@ -57,7 +57,7 @@ describe("processAttestation", function () {
         job: {attestation, validSignature: false},
       });
       expect.fail("attestation should throw");
-    } catch (e) {
+    } catch (e: unknown) {
       expect(e.type.code).to.equal(AttestationErrorCode.NO_COMMITTEE_FOR_SLOT_AND_INDEX);
     }
   });
@@ -76,7 +76,7 @@ describe("processAttestation", function () {
         job: {attestation, validSignature: false},
       });
       expect.fail("attestation should throw");
-    } catch (e) {
+    } catch (e: unknown) {
       expect(e.type.code).to.equal(AttestationErrorCode.INVALID_SIGNATURE);
     }
   });

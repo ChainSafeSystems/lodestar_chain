@@ -72,7 +72,7 @@ export class ValidatorApi implements IValidatorApi {
       const headRoot = this.chain.forkChoice.getHeadRoot();
       const state = await this.chain.regen.getBlockSlotState(headRoot, slot);
       return assembleAttestationData(state.config, state, headRoot, slot, committeeIndex);
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.warn("Failed to produce attestation data", e);
       throw e;
     }
@@ -136,7 +136,7 @@ export class ValidatorApi implements IValidatorApi {
             aggregationBits[index] = true;
           }
         });
-      } catch (e) {
+      } catch (e: unknown) {
         this.logger.verbose("Invalid attestation signature", e);
       }
     }
@@ -171,7 +171,7 @@ export class ValidatorApi implements IValidatorApi {
             this.db.seenAttestationCache.addAggregateAndProof(signedAggregateAndProof.message),
             this.network.gossip.publishBeaconAggregateAndProof(signedAggregateAndProof),
           ]);
-        } catch (e) {
+        } catch (e: unknown) {
           this.logger.warn("Failed to publish aggregate and proof", e);
         }
       })

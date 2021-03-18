@@ -20,7 +20,7 @@ function guessVersion(): string {
 export function getDefaultGraffiti(): string {
   try {
     return `${lodestarPackageName}-${guessVersion()}`;
-  } catch (e) {
+  } catch (e: unknown) {
     // eslint-disable-next-line no-console
     console.error("Error guessing lodestar version", e);
     return lodestarPackageName;

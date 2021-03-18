@@ -49,7 +49,7 @@ describe("gossipsub", function () {
     try {
       await gossipSub.validate(message);
       assert.fail("Expect error here");
-    } catch (e) {
+    } catch (e: unknown) {
       expect(e.code).to.be.equal(ERR_TOPIC_VALIDATOR_REJECT);
     }
   });

@@ -51,7 +51,7 @@ export async function processBlock({
     }
 
     await runStateTransition(emitter, forkChoice, checkpointStateCache, preState, job);
-  } catch (e) {
+  } catch (e: unknown) {
     if (e instanceof RegenError) {
       throw new BlockError({
         code: BlockErrorCode.PRESTATE_MISSING,
@@ -147,7 +147,7 @@ export async function processChainSegment({
         });
         importedBlocks++;
       }
-    } catch (e) {
+    } catch (e: unknown) {
       if (e instanceof RegenError) {
         throw new ChainSegmentError({
           code: BlockErrorCode.PRESTATE_MISSING,

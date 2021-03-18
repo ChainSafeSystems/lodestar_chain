@@ -39,7 +39,7 @@ export function isValidIndexedAttestation(
   const signatureSet = getIndexedAttestationSignatureSet(state, indexedAttestation, indices);
   try {
     return verifySignatureSet(signatureSet);
-  } catch (e) {
+  } catch (e: unknown) {
     return false;
   }
 }

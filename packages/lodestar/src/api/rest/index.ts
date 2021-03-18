@@ -30,7 +30,7 @@ export class RestApi {
       try {
         const address = await api.server.listen(_opts.port, _opts.host);
         logger.info("Started rest api server", {address});
-      } catch (e) {
+      } catch (e: unknown) {
         logger.error("Failed to start rest api server", {host: _opts.host, port: _opts.port}, e);
         throw e;
       }

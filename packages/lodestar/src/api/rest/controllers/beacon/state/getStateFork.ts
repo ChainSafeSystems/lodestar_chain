@@ -19,7 +19,7 @@ export const getStateFork: ApiController<DefaultQuery, Params> = {
       return resp.status(200).send({
         data: this.config.types.phase0.Fork.toJson(fork, {case: "snake"}),
       });
-    } catch (e) {
+    } catch (e: unknown) {
       if (e.message === "Invalid state id") {
         throw toRestValidationError("state_id", e.message);
       }

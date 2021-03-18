@@ -71,7 +71,7 @@ export async function validateBeaconBlock(
     logger.verbose("Started gossip block validation", logContext);
     await validateGossipBlock(config, chain, db, blockJob);
     logger.verbose("Received valid gossip block", logContext);
-  } catch (e) {
+  } catch (e: unknown) {
     if (!(e instanceof BlockError)) {
       logger.error("Gossip block validation threw a non-BlockError", e);
       throw new GossipValidationError(ERR_TOPIC_VALIDATOR_IGNORE);
@@ -122,7 +122,7 @@ export async function validateAggregatedAttestation(
     logger.verbose("Started gossip aggregate and proof validation", logContext);
     await validateGossipAggregateAndProof(config, chain, db, signedAggregateAndProof, attestationJob);
     logger.verbose("Received valid gossip aggregate and proof", logContext);
-  } catch (e) {
+  } catch (e: unknown) {
     if (!(e instanceof AttestationError)) {
       logger.error("Gossip aggregate and proof validation threw a non-AttestationError", e);
       throw new GossipValidationError(ERR_TOPIC_VALIDATOR_IGNORE);
@@ -178,7 +178,7 @@ export async function validateCommitteeAttestation(
     logger.verbose("Started gossip committee attestation validation", logContext);
     await validateGossipAttestation(config, chain, db, attestationJob, subnet);
     logger.verbose("Received valid committee attestation", logContext);
-  } catch (e) {
+  } catch (e: unknown) {
     if (!(e instanceof AttestationError)) {
       logger.error("Gossip attestation validation threw a non-AttestationError", e);
       throw new GossipValidationError(ERR_TOPIC_VALIDATOR_IGNORE);
@@ -222,7 +222,7 @@ export async function validateVoluntaryExit(
 ): Promise<void> {
   try {
     await validateGossipVoluntaryExit(config, chain, db, voluntaryExit);
-  } catch (e) {
+  } catch (e: unknown) {
     if (!(e instanceof VoluntaryExitError)) {
       logger.error("Gossip voluntary exit validation threw a non-VoluntaryExitError", e);
       throw new GossipValidationError(ERR_TOPIC_VALIDATOR_IGNORE);
@@ -248,7 +248,7 @@ export async function validateProposerSlashing(
 ): Promise<void> {
   try {
     await validateGossipProposerSlashing(config, chain, db, proposerSlashing);
-  } catch (e) {
+  } catch (e: unknown) {
     if (!(e instanceof ProposerSlashingError)) {
       logger.error("Gossip proposer slashing validation threw a non-ProposerSlashingError", e);
       throw new GossipValidationError(ERR_TOPIC_VALIDATOR_IGNORE);
@@ -274,7 +274,7 @@ export async function validateAttesterSlashing(
 ): Promise<void> {
   try {
     await validateGossipAttesterSlashing(config, chain, db, attesterSlashing);
-  } catch (e) {
+  } catch (e: unknown) {
     if (!(e instanceof AttesterSlashingError)) {
       logger.error("Gossip attester slashing validation threw a non-AttesterSlashingError", e);
       throw new GossipValidationError(ERR_TOPIC_VALIDATOR_IGNORE);

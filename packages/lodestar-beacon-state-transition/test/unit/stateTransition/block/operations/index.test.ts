@@ -47,7 +47,7 @@ describe("process block - process operations", function () {
     try {
       processOperations(config, state, body);
       expect.fail();
-    } catch (e) {}
+    } catch (e: unknown) {}
   });
 
   it("should fail to process operations - duplicate transfers", function () {
@@ -56,7 +56,7 @@ describe("process block - process operations", function () {
     try {
       processOperations(config, state, body);
       expect.fail();
-    } catch (e) {}
+    } catch (e: unknown) {}
   });
 
   it("should fail to process operations - proposerSlashings length  exceed maxProposerSlashings ", function () {
@@ -68,7 +68,7 @@ describe("process block - process operations", function () {
     try {
       processOperations(config, state, body);
       expect.fail();
-    } catch (e) {}
+    } catch (e: unknown) {}
   });
 
   it("should fail to process operations - attesterSlashings length  exceed maxAttesterSlashings", function () {
@@ -82,7 +82,7 @@ describe("process block - process operations", function () {
     try {
       processOperations(config, state, body);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(processProposerSlashingStub.calledOnce).to.be.true;
     }
   });
@@ -101,7 +101,7 @@ describe("process block - process operations", function () {
     try {
       processOperations(config, state, body);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(processProposerSlashingStub.calledOnce).to.be.true;
       expect(processAttesterSlashingStub.calledOnce).to.be.true;
     }
@@ -117,7 +117,7 @@ describe("process block - process operations", function () {
     try {
       processOperations(config, state, body);
       expect.fail();
-    } catch (e) {}
+    } catch (e: unknown) {}
   });
 
   it("should fail to process operations - voluntaryExit length  exceed maxVoluntaryExit", function () {
@@ -139,7 +139,7 @@ describe("process block - process operations", function () {
     try {
       processOperations(config, state, body);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(processProposerSlashingStub.calledOnce).to.be.true;
       expect(processAttesterSlashingStub.calledOnce).to.be.true;
       expect(processAttestationStub.calledOnce).to.be.true;
@@ -165,7 +165,7 @@ describe("process block - process operations", function () {
     try {
       processOperations(config, state, body);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(processProposerSlashingStub.calledOnce).to.be.true;
       expect(processAttesterSlashingStub.calledOnce).to.be.true;
       expect(processAttestationStub.calledOnce).to.be.true;
@@ -191,7 +191,7 @@ describe("process block - process operations", function () {
     try {
       processOperations(config, state, body);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(processProposerSlashingStub.calledOnce).to.be.true;
       expect(processAttesterSlashingStub.calledOnce).to.be.true;
       expect(processAttestationStub.calledOnce).to.be.true;

@@ -120,7 +120,7 @@ export async function generatePerformanceBlock(): Promise<TreeBacked<phase0.Sign
 export async function initBLS(): Promise<void> {
   try {
     await init("blst-native");
-  } catch (e) {
+  } catch (e: unknown) {
     console.warn("Performance warning: Using fallback wasm BLS implementation");
     await init("herumi");
   }

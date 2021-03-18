@@ -74,7 +74,7 @@ export function computeMsgId(topic: string, data: Uint8Array): {msgId: Uint8Arra
       try {
         uncompressed = uncompress(data);
         dataToHash = Buffer.concat([MESSAGE_DOMAIN_VALID_SNAPPY, uncompressed]);
-      } catch (e) {
+      } catch (e: unknown) {
         dataToHash = Buffer.concat([MESSAGE_DOMAIN_INVALID_SNAPPY, data]);
       }
       break;

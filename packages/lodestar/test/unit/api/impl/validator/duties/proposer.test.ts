@@ -43,7 +43,7 @@ describe("get proposers api impl", function () {
     try {
       await api.getProposerDuties(1);
       expect.fail("Expect error here");
-    } catch (e) {
+    } catch (e: unknown) {
       expect(e.message.startsWith("Node is syncing")).to.be.true;
     }
   });
@@ -54,7 +54,7 @@ describe("get proposers api impl", function () {
     try {
       await api.getProposerDuties(1);
       expect.fail("Expect error here");
-    } catch (e) {
+    } catch (e: unknown) {
       expect(e.message.startsWith("Node is stopped")).to.be.true;
     }
   });

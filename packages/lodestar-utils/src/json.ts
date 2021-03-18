@@ -69,7 +69,7 @@ function errorToObject(err: Error): Json {
 function JSONStringifyCircular(value: any): string {
   try {
     return JSON.stringify(value);
-  } catch (e) {
+  } catch (e: unknown) {
     if (e instanceof TypeError && e.message.includes("circular")) {
       return CIRCULAR_REFERENCE_TAG;
     } else {

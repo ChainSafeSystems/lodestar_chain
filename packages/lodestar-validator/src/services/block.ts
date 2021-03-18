@@ -149,7 +149,7 @@ export default class BlockProposingService {
         validatorKeys.secretKey.sign(randaoSigningRoot).toBytes(),
         this.graffiti || ""
       );
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error("Failed to produce block", {slot}, e);
     }
     if (!block) {
@@ -178,7 +178,7 @@ export default class BlockProposingService {
         hash: toHexString(this.config.types.phase0.BeaconBlock.hashTreeRoot(block)),
         slot,
       });
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error("Failed to publish block", {slot}, e);
     }
     return signedBlock;

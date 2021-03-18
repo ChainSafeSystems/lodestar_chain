@@ -110,7 +110,7 @@ export class AttestationService {
         if (v.validator?.index != null) indices.push(v.validator?.index);
       }
       attesterDuties = await this.provider.validator.getAttesterDuties(epoch, indices);
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error("Failed to obtain attester duty", {epoch, error: e.message});
       return;
     }
@@ -151,7 +151,7 @@ export class AttestationService {
             isAggregator,
           },
         ]);
-      } catch (e) {
+      } catch (e: unknown) {
         this.logger.error("Failed to subscribe to committee subnet", e);
       }
     }
@@ -182,7 +182,7 @@ export class AttestationService {
         return;
       }
       attestation = await this.createAttestation(duty, fork, this.provider.genesisValidatorsRoot, validator);
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error("Failed to produce attestation", {
         slot: duty.slot,
         committee: duty.committeeIndex,
@@ -208,7 +208,7 @@ export class AttestationService {
             }
             await this.aggregateAttestations(duty, attestation, fork, this.provider.genesisValidatorsRoot, validator);
           }
-        } catch (e) {
+        } catch (e: unknown) {
           this.logger.error("Failed to aggregate attestations", e);
         }
       }, (this.config.params.SECONDS_PER_SLOT / 3) * 1000);
@@ -222,7 +222,7 @@ export class AttestationService {
         block: toHexString(attestation.data.target.root),
         validator: toHexString(duty.pubkey),
       });
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error("Failed to publish attestation", e);
     }
   }
@@ -277,7 +277,7 @@ export class AttestationService {
         this.config.types.phase0.AttestationData.hashTreeRoot(attestation.data),
         duty.slot
       );
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error("Failed to produce aggregate and proof", e);
       return;
     }
@@ -294,7 +294,7 @@ export class AttestationService {
     try {
       await this.provider.validator.publishAggregateAndProofs([signedAggregateAndProof]);
       this.logger.info("Published signed aggregate and proof", {committeeIndex: duty.committeeIndex, slot: duty.slot});
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error(
         "Failed to publish aggregate and proof",
         {committeeIndex: duty.committeeIndex, slot: duty.slot},
@@ -351,7 +351,7 @@ export class AttestationService {
     let attestationData: phase0.AttestationData;
     try {
       attestationData = await this.provider.validator.produceAttestationData(committeeIndex, slot);
-    } catch (e) {
+    } catch (e: unknown) {
       e.message = `Failed to obtain attestation data at slot ${slot} and committee ${committeeIndex}: ${e.message}`;
       throw e;
     }
@@ -396,7 +396,7 @@ export class AttestationService {
       if (!v.validator) {
         try {
           v.validator = await this.provider.beacon.state.getStateValidator("head", fromHexString(pk));
-        } catch (e) {
+        } catch (e: unknown) {
           this.logger.error("Failed to get validator details", e);
           v.validator = null;
         }

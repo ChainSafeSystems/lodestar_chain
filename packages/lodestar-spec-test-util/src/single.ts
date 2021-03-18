@@ -113,7 +113,7 @@ function generateTestCase<TestCase, Result>(
     if (options.shouldError && options.shouldError(testCase)) {
       try {
         testFunction(testCase, name);
-      } catch (e) {
+      } catch (e: unknown) {
         return;
       }
     } else {

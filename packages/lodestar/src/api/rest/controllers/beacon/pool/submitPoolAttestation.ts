@@ -9,7 +9,7 @@ export const submitPoolAttestation: ApiController = {
     let attestation: phase0.Attestation;
     try {
       attestation = this.config.types.phase0.Attestation.fromJson(req.body, {case: "snake"});
-    } catch (e) {
+    } catch (e: unknown) {
       throw new ValidationError("Failed to deserialize attestation");
     }
     await this.api.beacon.pool.submitAttestation(attestation);

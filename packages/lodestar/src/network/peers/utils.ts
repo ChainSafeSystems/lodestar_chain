@@ -45,7 +45,7 @@ export async function handlePeerMetadataSequence(
     try {
       logger.verbose("Getting peer metadata", {peer: peer.toB58String()});
       network.peerMetadata.metadata.set(peer, await network.reqResp.metadata(peer));
-    } catch (e) {
+    } catch (e: unknown) {
       logger.verbose("Cannot get peer metadata", {peer: peer.toB58String(), e: e.message});
     }
   } else {

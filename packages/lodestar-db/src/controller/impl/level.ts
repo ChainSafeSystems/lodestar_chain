@@ -58,7 +58,7 @@ export class LevelDbController implements IDatabaseController<Buffer, Buffer> {
   async get(key: Buffer): Promise<Buffer | null> {
     try {
       return await this.db.get(key);
-    } catch (e) {
+    } catch (e: unknown) {
       if (e.notFound) {
         return null;
       }

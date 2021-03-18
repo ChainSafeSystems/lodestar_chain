@@ -28,7 +28,7 @@ describe.skip("process block - randao", function () {
     try {
       processRandao(config, state, block.body);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(getBeaconProposerStub.calledOnce).to.be.true;
     }
   });

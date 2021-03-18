@@ -185,7 +185,7 @@ export class BeaconSync implements IBeaconSync {
     this.statusSyncTimer = setInterval(async () => {
       try {
         await syncPeersStatus(this.network, this.chain.getStatus());
-      } catch (e) {
+      } catch (e: unknown) {
         this.logger.error("Error on syncPeersStatus", e);
       }
     }, interval);
@@ -245,7 +245,7 @@ export class BeaconSync implements IBeaconSync {
           this.chain.receiveBlock(blocks[0]);
           break;
         }
-      } catch (e) {
+      } catch (e: unknown) {
         this.logger.verbose("Failed to get unknown ancestor root from peer", {
           parentRootHex,
           peer: peer.toB58String(),

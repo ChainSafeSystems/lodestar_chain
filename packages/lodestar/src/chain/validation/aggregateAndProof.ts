@@ -82,7 +82,7 @@ export async function validateAggregateAttestation(
   try {
     // the target state, advanced to the attestation slot
     attestationPreState = await chain.regen.getBlockSlotState(attestation.data.target.root, attestation.data.slot);
-  } catch (e) {
+  } catch (e: unknown) {
     throw new AttestationError({
       code: AttestationErrorCode.MISSING_ATTESTATION_PRESTATE,
       job: attestationJob,

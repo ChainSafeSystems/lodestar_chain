@@ -63,7 +63,7 @@ export class AttestationCollector {
       } else {
         this.aggregationDuties.set(slot, new Set([committeeIndex]));
       }
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error("Unable to subscribe to attestation subnet", {subnet});
     }
   }
@@ -88,7 +88,7 @@ export class AttestationCollector {
   private unsubscribeSubnet = (subnet: number, fork: IForkName): void => {
     try {
       this.network.gossip.unsubscribeTopic({type: GossipType.beacon_attestation, fork, subnet});
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error("Unable to unsubscribe to attestation subnet", {subnet});
     }
   };

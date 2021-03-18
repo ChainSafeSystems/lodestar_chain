@@ -41,7 +41,7 @@ describe("httpClient test", () => {
   it("should handle http status code 404 correctly", async () => {
     try {
       await httpClient.get<IUser>("/wrong_url");
-    } catch (e) {
+    } catch (e: unknown) {
       assert.equal(e.message, "Endpoint not found");
     }
   });
@@ -50,7 +50,7 @@ describe("httpClient test", () => {
     mock.onGet("/users/!").reply(500, "internal server error");
     try {
       await httpClient.get<IUser>("/users/!");
-    } catch (e) {
+    } catch (e: unknown) {
       assert.equal(e.message, "Request failed with response status 500");
     }
   });

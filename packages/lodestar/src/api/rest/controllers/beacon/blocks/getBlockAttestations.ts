@@ -16,7 +16,7 @@ export const getBlockAttestations: ApiController<DefaultQuery, {blockId: string}
           this.config.types.phase0.Attestation.toJson(attestations, {case: "snake"});
         }),
       });
-    } catch (e) {
+    } catch (e: unknown) {
       if (e.message === "Invalid block id") {
         throw toRestValidationError("block_id", e.message);
       }

@@ -9,7 +9,7 @@ export const publishBlock: ApiController = {
     let block: phase0.SignedBeaconBlock;
     try {
       block = this.config.types.phase0.SignedBeaconBlock.fromJson(req.body, {case: "snake"});
-    } catch (e) {
+    } catch (e: unknown) {
       throw new ValidationError("Failed to deserialize block");
     }
     await this.api.beacon.blocks.publishBlock(block);

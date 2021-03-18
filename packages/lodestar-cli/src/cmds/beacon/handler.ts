@@ -68,7 +68,7 @@ export async function beaconHandler(args: IBeaconArgs & IGlobalArgs): Promise<vo
     });
 
     abortController.signal.addEventListener("abort", () => node.close(), {once: true});
-  } catch (e) {
+  } catch (e: unknown) {
     await db.stop();
 
     if (e instanceof ErrorAborted) {

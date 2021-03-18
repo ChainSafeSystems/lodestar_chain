@@ -94,7 +94,7 @@ export async function runNodeNotifier({
       // Log halfway through each slot
       await sleep(timeToNextHalfSlot(config, chain), signal);
     }
-  } catch (e) {
+  } catch (e: unknown) {
     if (e instanceof ErrorAborted) {
       return; // Ok
     } else {

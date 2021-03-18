@@ -29,7 +29,7 @@ export class HttpClient {
       const result: AxiosResponse<T> = await this.client.get<T>(url, opts);
       this.logger.verbose("HttpClient GET", {url, result: JSON.stringify(result.data)});
       return result.data;
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.verbose("HttpClient GET error", {url}, e);
       throw this.handleError(e);
     }
@@ -41,7 +41,7 @@ export class HttpClient {
       const result: AxiosResponse<T2> = await this.client.post(url, data);
       this.logger.verbose("HttpClient POST", {url, result: JSON.stringify(result.data)});
       return result.data;
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.verbose("HttpClient POST error", {url}, e);
       throw this.handleError(e);
     }

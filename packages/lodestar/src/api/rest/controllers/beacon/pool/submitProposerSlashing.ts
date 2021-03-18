@@ -9,7 +9,7 @@ export const submitProposerSlashing: ApiController = {
     let slashing: phase0.ProposerSlashing;
     try {
       slashing = this.config.types.phase0.ProposerSlashing.fromJson(req.body, {case: "snake"});
-    } catch (e) {
+    } catch (e: unknown) {
       throw new ValidationError("Failed to deserialize proposer slashing");
     }
     await this.api.beacon.pool.submitProposerSlashing(slashing);

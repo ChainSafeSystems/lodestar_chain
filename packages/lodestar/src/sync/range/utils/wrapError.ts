@@ -6,7 +6,7 @@ type Result<T> = {err: null; result: T} | {err: Error};
  * ```ts
  * try {
  *   A()
- * } catch (e) {
+ * } catch (e: unknown) {
  *   B()
  * }
  * ```

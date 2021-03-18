@@ -66,7 +66,7 @@ export async function getBlockRange(
           let chunkBlocks;
           try {
             chunkBlocks = await getBlockRangeFromPeer(rpc, peer!, chunk);
-          } catch (e) {
+          } catch (e: unknown) {
             chunkBlocks = null;
           }
           if (chunkBlocks) {

@@ -94,7 +94,7 @@ async function readSszSnappyBody(bufferedSource: BufferedSource, sszDataLength: 
       if (uncompressed !== null) {
         uncompressedData.append(uncompressed);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       throw new SszSnappyError({code: SszSnappyErrorCode.DECOMPRESSOR_ERROR, decompressorError: e});
     }
 
@@ -131,7 +131,7 @@ function deserializeSszBody<T extends RequestOrResponseBody>(
     } else {
       return type.deserialize(bytes) as T;
     }
-  } catch (e) {
+  } catch (e: unknown) {
     throw new SszSnappyError({code: SszSnappyErrorCode.DESERIALIZE_ERROR, deserializeError: e});
   }
 }

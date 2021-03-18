@@ -56,7 +56,7 @@ export async function validateGossipBlock(
   try {
     // getBlockSlotState also checks for whether the current finalized checkpoint is an ancestor of the block.  as a result, we throw an IGNORE (whereas the spec says we should REJECT for this scenario).  this is something we should change this in the future to make the code airtight to the spec.
     blockState = await chain.regen.getBlockSlotState(block.message.parentRoot, block.message.slot);
-  } catch (e) {
+  } catch (e: unknown) {
     throw new BlockError({
       code: BlockErrorCode.PARENT_UNKNOWN,
       parentRoot: block.message.parentRoot,

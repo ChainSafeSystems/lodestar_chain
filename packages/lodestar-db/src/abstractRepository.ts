@@ -57,7 +57,7 @@ export abstract class Repository<I extends Id, T> {
       const value = await this.db.get(this.encodeKey(id));
       if (!value) return null;
       return value;
-    } catch (e) {
+    } catch (e: unknown) {
       return null;
     }
   }

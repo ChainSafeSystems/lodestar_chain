@@ -54,7 +54,7 @@ describe("Run single node single thread interop validators (no eth1) until check
       await Promise.all(validators.map((v) => v.start()));
       try {
         await justificationEventListener;
-      } catch (e) {
+      } catch (e: unknown) {
         await Promise.all(validators.map((v) => v.stop()));
         await bn.close();
         expect(`failed to get event: ${testCase.event}`);

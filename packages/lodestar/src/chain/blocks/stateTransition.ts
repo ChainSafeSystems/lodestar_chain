@@ -112,14 +112,6 @@ export function emitForkChoiceHeadEvents(
   }
 }
 
-export function emitBlockEvent(
-  emitter: ChainEventEmitter,
-  job: IBlockJob,
-  postState: CachedBeaconState<phase0.BeaconState>
-): void {
-  emitter.emit(ChainEvent.block, job.signedBlock, postState, job);
-}
-
 export async function runStateTransition(
   emitter: ChainEventEmitter,
   forkChoice: IForkChoice,
@@ -153,7 +145,7 @@ export async function runStateTransition(
     emitCheckpointEvent(emitter, postState);
   }
 
-  emitBlockEvent(emitter, job, postState);
+  emitter.emit(ChainEvent.block, job.signedBlock, postState, job);
   emitForkChoiceHeadEvents(emitter, forkChoice, forkChoice.getHead(), oldHead);
 
   // this avoids keeping our node busy processing blocks

@@ -4,7 +4,7 @@ import {before} from "mocha";
 before(async function () {
   try {
     await init("blst-native");
-  } catch (e) {
+  } catch (e: unknown) {
     console.log(e);
   }
 });

@@ -43,7 +43,7 @@ export async function processAttestationJob(modules: AttestationProcessorModules
   try {
     validateAttestation({...modules, job});
     await processAttestation({...modules, job});
-  } catch (e) {
+  } catch (e: unknown) {
     // above functions only throw AttestationError
     modules.emitter.emit(ChainEvent.errorAttestation, e);
   }

@@ -7,7 +7,7 @@ export function expectThrowsLodestarError(fn: () => any, expectedErr: LodestarEr
     const value = fn();
     const json = JSON.stringify(value, null, 2);
     throw Error(`Expected fn to throw but returned value: \n\n\t${json}`);
-  } catch (e) {
+  } catch (e: unknown) {
     expectLodestarError(e, expectedErr);
   }
 }
@@ -20,7 +20,7 @@ export async function expectRejectedWithLodestarError(
     const value = await promise;
     const json = JSON.stringify(value, null, 2);
     throw Error(`Expected promise to reject but returned value: \n\n\t${json}`);
-  } catch (e) {
+  } catch (e: unknown) {
     if (typeof expectedErr === "string") {
       expectLodestarErrorCode(e, expectedErr);
     } else {

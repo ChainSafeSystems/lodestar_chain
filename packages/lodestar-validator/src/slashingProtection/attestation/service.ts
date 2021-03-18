@@ -68,7 +68,7 @@ export class SlashingProtectionAttestationService {
     // Check for a surround vote
     try {
       await this.minMaxSurround.assertNoSurround(pubKey, {source: att.sourceEpoch, target: att.targetEpoch});
-    } catch (e) {
+    } catch (e: unknown) {
       if (e instanceof SurroundAttestationError) {
         const prev = await this.attestationByTarget.get(pubKey, e.type.att2Target).catch(() => null);
         switch (e.type.code) {

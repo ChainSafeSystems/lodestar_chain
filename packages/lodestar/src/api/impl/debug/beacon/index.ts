@@ -27,7 +27,7 @@ export class DebugBeaconApi implements IDebugBeaconApi {
       return this.chain.forkChoice
         .getHeads()
         .map((blockSummary) => ({slot: blockSummary.slot, root: blockSummary.blockRoot}));
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error("Failed to get forkchoice heads", e);
       return null;
     }
@@ -36,7 +36,7 @@ export class DebugBeaconApi implements IDebugBeaconApi {
   async getState(stateId: StateId): Promise<phase0.BeaconState | null> {
     try {
       return await resolveStateId(this.chain, this.db, stateId);
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error("Failed to resolve state", {state: stateId, error: e});
       throw e;
     }

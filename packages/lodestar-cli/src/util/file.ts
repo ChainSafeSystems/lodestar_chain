@@ -95,7 +95,7 @@ export function readFile<T = Json>(filepath: string): T {
 export function readFileIfExists<T = Json>(filepath: string): T | null {
   try {
     return readFile(filepath);
-  } catch (e) {
+  } catch (e: unknown) {
     if (e.code === "ENOENT") {
       return null;
     } else {

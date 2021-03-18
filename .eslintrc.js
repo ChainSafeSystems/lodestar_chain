@@ -86,6 +86,7 @@ module.exports = {
     "@typescript-eslint/type-annotation-spacing": "error",
     "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/explicit-member-accessibility": ["error", {accessibility: "no-public"}],
+    "@typescript-eslint/no-implicit-any-catch": "error",
     "import/no-extraneous-dependencies": [
       "error",
       {

@@ -51,7 +51,7 @@ export async function handleRequest(
           onChunk(() => logger.debug("Resp sending chunk", logCtx)),
           responseEncodeSuccess(config, method, encoding)
         );
-      } catch (e) {
+      } catch (e: unknown) {
         const status = e instanceof ResponseError ? e.status : RpcResponseStatus.SERVER_ERROR;
         yield* responseEncodeError(status, e.message);
 

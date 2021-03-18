@@ -96,7 +96,7 @@ export class TasksService {
       // tasks rely on extended fork choice
       this.chain.forkChoice.prune(finalized.root);
       this.logger.verbose("Finish processing finalized checkpoint", {epoch: finalized.epoch});
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.error("Error processing finalized checkpoint", {epoch: finalized.epoch}, e);
     }
   };

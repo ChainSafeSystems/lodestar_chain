@@ -136,7 +136,7 @@ describe("sync req resp", function () {
       for await (const chunk of syncRpc.onRequest(Method.BeaconBlocksByRange, requestBody, peerId)) {
         slots.push((chunk as phase0.SignedBeaconBlock).message.slot);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.log({e});
       //
     }

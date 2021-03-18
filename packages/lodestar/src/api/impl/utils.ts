@@ -10,7 +10,7 @@ export async function checkSyncStatus(config: IBeaconConfig, sync: IBeaconSync):
     let syncStatus;
     try {
       syncStatus = sync.getSyncStatus();
-    } catch (e) {
+    } catch (e: unknown) {
       throw new ApiError(503, "Node is stopped");
     }
     if (syncStatus.syncDistance > config.params.SLOTS_PER_EPOCH) {

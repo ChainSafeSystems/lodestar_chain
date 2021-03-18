@@ -31,7 +31,7 @@ export function readLodestarGitData(): GitData {
     const gitData = JSON.parse(fs.readFileSync(gitDataFilepath, "utf8"));
     const {version: semver, branch, commit} = gitData;
     return {semver, branch, commit, version: `${semver} ${branch} ${commit.slice(0, 8)}`};
-  } catch (e) {
+  } catch (e: unknown) {
     return {semver: "", branch: "", commit: "", version: e.message};
   }
 }

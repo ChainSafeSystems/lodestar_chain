@@ -50,7 +50,7 @@ describe("process block - deposits", function () {
     verifyMerkleBranchStub.returns(false);
     try {
       processDeposit(config, state, generateDeposit());
-    } catch (e) {
+    } catch (e: unknown) {
       expect(verifyMerkleBranchStub.calledOnce).to.be.true;
     }
   });
@@ -60,7 +60,7 @@ describe("process block - deposits", function () {
     verifyMerkleBranchStub.returns(true);
     try {
       processDeposit(config, state, generateDeposit());
-    } catch (e) {
+    } catch (e: unknown) {
       expect(verifyMerkleBranchStub.calledOnce).to.be.true;
     }
   });
@@ -71,7 +71,7 @@ describe("process block - deposits", function () {
     const deposit = generateDeposit();
     try {
       processDeposit(config, state, deposit);
-    } catch (e) {
+    } catch (e: unknown) {
       expect(verifyMerkleBranchStub.calledOnce).to.be.true;
       expect(state.validators.length).to.be.equal(0);
       expect(state.balances.length).to.be.equal(0);

@@ -189,7 +189,7 @@ export class Network extends (EventEmitter as {new (): NetworkEventEmitter}) imp
   async disconnect(peerId: PeerId): Promise<void> {
     try {
       await this.libp2p.hangUp(peerId);
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.warn("Unclean disconnect", {reason: e.message});
     }
   }
@@ -230,7 +230,7 @@ export class Network extends (EventEmitter as {new (): NetworkEventEmitter}) imp
         await this.connect(peer.peerId, [peer.multiaddr]);
         found = true;
         break;
-      } catch (e) {
+      } catch (e: unknown) {
         // this runs too frequently so make it verbose
         this.logger.verbose("Cannot connect to peer", {peerId: peer.peerId.toB58String(), subnet, error: e.message});
       }

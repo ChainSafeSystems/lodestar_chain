@@ -22,7 +22,7 @@ describeDirectorySpecTest<IAggregateSigsTestCase, string | null>(
         })
       );
       return `0x${Buffer.from(result).toString("hex")}`;
-    } catch (e) {
+    } catch (e: unknown) {
       if (e.message === "signatures is null or undefined or empty array") {
         return null;
       }

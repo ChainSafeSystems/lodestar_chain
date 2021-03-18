@@ -76,7 +76,7 @@ export async function validateGossipAttestation(
   let attestationPreState;
   try {
     attestationPreState = await chain.regen.getCheckpointState(attestation.data.target);
-  } catch (e) {
+  } catch (e: unknown) {
     throw new AttestationError({
       code: AttestationErrorCode.MISSING_ATTESTATION_PRESTATE,
       job: attestationJob,

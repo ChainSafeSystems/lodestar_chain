@@ -50,7 +50,7 @@ export class BeaconPoolApi implements IBeaconPoolApi {
     let attestationPreState;
     try {
       attestationPreState = await this.chain.regen.getCheckpointState(attestation.data.target);
-    } catch (e) {
+    } catch (e: unknown) {
       throw new AttestationError({
         code: AttestationErrorCode.MISSING_ATTESTATION_PRESTATE,
         job: attestationJob,

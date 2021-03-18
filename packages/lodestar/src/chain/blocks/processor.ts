@@ -71,7 +71,7 @@ export async function processBlockJob(modules: BlockProcessorModules, job: IBloc
   try {
     validateBlock({...modules, job});
     await processBlock({...modules, job});
-  } catch (e) {
+  } catch (e: unknown) {
     // above functions only throw BlockError
     modules.emitter.emit(ChainEvent.errorBlock, e);
   }
@@ -119,7 +119,7 @@ export async function processChainSegmentJob(modules: BlockProcessorModules, job
       validateBlock({...modules, job: {...job, signedBlock: block}});
       // If the block is relevant, add it to the filtered chain segment.
       filteredChainSegment.push(block);
-    } catch (e) {
+    } catch (e: unknown) {
       switch ((e as BlockError).type.code) {
         // If the block is already known, simply ignore this block.
         case BlockErrorCode.BLOCK_IS_ALREADY_KNOWN:

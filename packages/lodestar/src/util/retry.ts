@@ -25,7 +25,7 @@ export async function retry<A>(fn: (attempt: number) => A | Promise<A>, opts?: I
   for (let i = 1; i <= maxRetries; i++) {
     try {
       return await fn(i);
-    } catch (e) {
+    } catch (e: unknown) {
       lastError = e;
       if (shouldRetry && !shouldRetry(lastError)) {
         break;

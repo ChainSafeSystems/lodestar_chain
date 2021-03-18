@@ -192,7 +192,7 @@ export class BeaconChain implements IBeaconChain {
     }
     try {
       return await this.regen.getState(blockSummary.stateRoot);
-    } catch (e) {
+    } catch (e: unknown) {
       return null;
     }
   }

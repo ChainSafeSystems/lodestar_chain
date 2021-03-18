@@ -30,7 +30,7 @@ describe("process block - block header", function () {
     try {
       processBlockHeader(config, state, block);
       expect.fail();
-    } catch (e) {}
+    } catch (e: unknown) {}
   });
 
   it("fail to process header - invalid parent header", function () {
@@ -41,7 +41,7 @@ describe("process block - block header", function () {
     try {
       processBlockHeader(config, state, block);
       expect.fail();
-    } catch (e) {}
+    } catch (e: unknown) {}
   });
 
   it("fail to process header - proposerSlashed", function () {
@@ -53,7 +53,7 @@ describe("process block - block header", function () {
     try {
       processBlockHeader(config, state, block);
       expect.fail();
-    } catch (e) {}
+    } catch (e: unknown) {}
   });
 
   it.skip("should process block", function () {

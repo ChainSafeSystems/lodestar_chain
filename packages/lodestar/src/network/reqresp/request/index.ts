@@ -129,7 +129,7 @@ export async function sendRequest<T extends phase0.ResponseBody | phase0.Respons
       // If collectResponses() exhausts the source, it-pushable.end() can be safely called multiple times
       stream.close();
     }
-  } catch (e) {
+  } catch (e: unknown) {
     logger.verbose("Req  error", logCtx, e);
 
     const metadata: IRequestErrorMetadata = {method, encoding, peer};

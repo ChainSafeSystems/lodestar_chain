@@ -40,7 +40,7 @@ describe("Job queue", () => {
     try {
       // the next enqueued job should go over the limit
       await jobQueue.enqueueJob(job);
-    } catch (e) {
+    } catch (e: unknown) {
       assertQueueErrorCode(e, QueueErrorCode.QUEUE_THROTTLED);
     }
 
@@ -70,7 +70,7 @@ describe("Job queue", () => {
     // any subsequently enqueued job should also be rejected
     try {
       await jobQueue.enqueueJob(job);
-    } catch (e) {
+    } catch (e: unknown) {
       assertQueueErrorCode(e, QueueErrorCode.QUEUE_ABORTED);
     }
   });

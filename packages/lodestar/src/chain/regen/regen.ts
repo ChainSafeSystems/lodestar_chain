@@ -189,7 +189,7 @@ export class StateRegenerator implements IStateRegenerator {
           validSignatures: true,
           validProposerSignature: true,
         });
-      } catch (e) {
+      } catch (e: unknown) {
         throw new RegenError({
           code: RegenErrorCode.STATE_TRANSITION_ERROR,
           error: e,

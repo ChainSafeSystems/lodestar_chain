@@ -41,7 +41,7 @@ describe("processBlock", function () {
         job,
       });
       expect.fail("block should throw");
-    } catch (e) {
+    } catch (e: unknown) {
       expect(e.type.code).to.equal(BlockErrorCode.PARENT_UNKNOWN);
     }
   });
@@ -61,7 +61,7 @@ describe("processBlock", function () {
         job,
       });
       expect.fail("block should throw");
-    } catch (e) {
+    } catch (e: unknown) {
       expect(e.type.code).to.equal(BlockErrorCode.PRESTATE_MISSING);
     }
   });

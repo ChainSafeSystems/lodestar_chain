@@ -14,7 +14,7 @@ export const getBlock: ApiController<DefaultQuery, {blockId: string}> = {
       return resp.status(200).send({
         data: this.config.types.phase0.SignedBeaconBlock.toJson(data, {case: "snake"}),
       });
-    } catch (e) {
+    } catch (e: unknown) {
       if (e.message === "Invalid block id") {
         throw toRestValidationError("block_id", e.message);
       }

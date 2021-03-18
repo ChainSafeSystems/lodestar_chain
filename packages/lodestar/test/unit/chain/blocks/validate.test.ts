@@ -28,7 +28,7 @@ describe("validateBlock", function () {
     try {
       validateBlock({config, forkChoice, clock, job});
       expect.fail("block should throw");
-    } catch (e) {
+    } catch (e: unknown) {
       expect(e.type.code).to.equal(BlockErrorCode.GENESIS_BLOCK);
     }
   });
@@ -41,7 +41,7 @@ describe("validateBlock", function () {
     try {
       validateBlock({config, forkChoice, clock, job});
       expect.fail("block should throw");
-    } catch (e) {
+    } catch (e: unknown) {
       expect(e.type.code).to.equal(BlockErrorCode.BLOCK_IS_ALREADY_KNOWN);
     }
   });
@@ -55,7 +55,7 @@ describe("validateBlock", function () {
     try {
       validateBlock({config, forkChoice, clock, job});
       expect.fail("block should throw");
-    } catch (e) {
+    } catch (e: unknown) {
       expect(e.type.code).to.equal(BlockErrorCode.WOULD_REVERT_FINALIZED_SLOT);
     }
   });
@@ -70,7 +70,7 @@ describe("validateBlock", function () {
     try {
       validateBlock({config, forkChoice, clock, job});
       expect.fail("block should throw");
-    } catch (e) {
+    } catch (e: unknown) {
       expect(e.type.code).to.equal(BlockErrorCode.FUTURE_SLOT);
     }
   });

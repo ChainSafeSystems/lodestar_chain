@@ -37,7 +37,7 @@ describe("syncing", function () {
 
     try {
       await finalizationEventListener;
-    } catch (e) {
+    } catch (e: unknown) {
       assert.fail("Failed to reach finalization");
     }
     const bn2 = await getDevBeaconNode({
@@ -53,7 +53,7 @@ describe("syncing", function () {
     await bn2.network.connect(bn.network.peerId, bn.network.localMultiaddrs);
     try {
       await waitForSynced;
-    } catch (e) {
+    } catch (e: unknown) {
       assert.fail("Failed to sync to other node in time");
     }
     await bn2.close();

@@ -16,7 +16,7 @@ export const getBlockRoot: ApiController<DefaultQuery, {blockId: string}> = {
           root: this.config.types.Root.toJson(this.config.types.phase0.BeaconBlock.hashTreeRoot(data.message)),
         },
       });
-    } catch (e) {
+    } catch (e: unknown) {
       if (e.message === "Invalid block id") {
         throw toRestValidationError("block_id", e.message);
       }

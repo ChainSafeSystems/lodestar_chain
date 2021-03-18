@@ -22,7 +22,7 @@ export const getState: ApiController<DefaultQuery, {stateId: string}> = {
           data: this.config.types.phase0.BeaconState.toJson(state, {case: "snake"}),
         });
       }
-    } catch (e) {
+    } catch (e: unknown) {
       if (e.message === "Invalid state id") {
         throw toRestValidationError("state_id", e.message);
       }

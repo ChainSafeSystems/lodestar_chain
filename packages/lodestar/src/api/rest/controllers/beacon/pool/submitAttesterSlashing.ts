@@ -9,7 +9,7 @@ export const submitAttesterSlashing: ApiController = {
     let slashing: phase0.AttesterSlashing;
     try {
       slashing = this.config.types.phase0.AttesterSlashing.fromJson(req.body, {case: "snake"});
-    } catch (e) {
+    } catch (e: unknown) {
       throw new ValidationError("Failed to deserialize attester slashing");
     }
     await this.api.beacon.pool.submitAttesterSlashing(slashing);

@@ -32,7 +32,7 @@ describe("process block - proposer slashings", function () {
     try {
       processProposerSlashing(config, state, proposerSlashing);
       expect.fail();
-    } catch (e) {}
+    } catch (e: unknown) {}
   });
 
   it("should fail to process - same headers", function () {
@@ -43,7 +43,7 @@ describe("process block - proposer slashings", function () {
     try {
       processProposerSlashing(config, state, proposerSlashing);
       expect.fail();
-    } catch (e) {}
+    } catch (e: unknown) {}
   });
 
   it("should fail to process - same headers", function () {
@@ -55,7 +55,7 @@ describe("process block - proposer slashings", function () {
     try {
       processProposerSlashing(config, state, proposerSlashing);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       // different slot so it failed without calling isSlashableValidator
       expect(isSlashableValidatorStub.calledOnce).to.be.false;
     }
@@ -70,7 +70,7 @@ describe("process block - proposer slashings", function () {
     try {
       processProposerSlashing(config, state, proposerSlashing, true);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(isSlashableValidatorStub.calledOnce).to.be.true;
     }
   });
@@ -86,7 +86,7 @@ describe("process block - proposer slashings", function () {
     try {
       processProposerSlashing(config, state, proposerSlashing);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(isSlashableValidatorStub.calledOnce).to.be.true;
     }
   });

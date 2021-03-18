@@ -54,7 +54,7 @@ export function validateBlock({
         job,
       });
     }
-  } catch (e) {
+  } catch (e: unknown) {
     if (e instanceof BlockError) {
       throw e;
     }

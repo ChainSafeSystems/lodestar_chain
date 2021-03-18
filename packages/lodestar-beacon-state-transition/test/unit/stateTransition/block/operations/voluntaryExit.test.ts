@@ -32,7 +32,7 @@ describe("process block - voluntary exits", function () {
     try {
       processVoluntaryExit(config, state, exit);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(isActiveValidatorStub.calledOnce).to.be.true;
     }
   });
@@ -45,7 +45,7 @@ describe("process block - voluntary exits", function () {
     try {
       processVoluntaryExit(config, state, exit);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(isActiveValidatorStub.calledOnce).to.be.true;
     }
   });
@@ -59,7 +59,7 @@ describe("process block - voluntary exits", function () {
     try {
       processVoluntaryExit(config, state, exit);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(isActiveValidatorStub.calledOnce).to.be.true;
     }
   });
@@ -73,7 +73,7 @@ describe("process block - voluntary exits", function () {
     try {
       processVoluntaryExit(config, state, exit);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(isActiveValidatorStub.calledOnce).to.be.true;
     }
   });
@@ -87,7 +87,7 @@ describe("process block - voluntary exits", function () {
     try {
       processVoluntaryExit(config, state, exit);
       expect.fail();
-    } catch (e) {
+    } catch (e: unknown) {
       expect(isActiveValidatorStub.calledOnce).to.be.true;
     }
   });
