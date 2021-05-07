@@ -1,5 +1,5 @@
 import PeerId from "peer-id";
-import Multiaddr from "multiaddr";
+import {Multiaddr} from "multiaddr";
 import {IBeaconNodeOptions} from "@chainsafe/lodestar";
 import {ENR, createKeypairFromPeerId} from "@chainsafe/discv5";
 import {writeFile, readFile} from "../util";
@@ -35,7 +35,7 @@ export function initEnr(filepath: string, peerId: PeerId): void {
 export function overwriteEnrWithCliArgs(enr: ENR, enrArgs: IENRJson, options: IBeaconNodeOptions): void {
   if (options.network.localMultiaddrs.length) {
     try {
-      const tcpOpts = Multiaddr(options.network.localMultiaddrs[0]).toOptions();
+      const tcpOpts = new Multiaddr(options.network.localMultiaddrs[0]).toOptions();
       if (tcpOpts.transport === "tcp") {
         enr.tcp = tcpOpts.port;
       }
@@ -46,7 +46,7 @@ export function overwriteEnrWithCliArgs(enr: ENR, enrArgs: IENRJson, options: IB
 
   if (options.network.discv5?.bindAddr) {
     try {
-      const udpOpts = Multiaddr(options.network.localMultiaddrs[0]).toOptions();
+      const udpOpts = new Multiaddr(options.network.localMultiaddrs[0]).toOptions();
       if (udpOpts.transport === "udp") {
         enr.udp = udpOpts.port;
       }

@@ -47,8 +47,8 @@ describe("gossip aggregate and proof test", function () {
         mock(() => import("@chainsafe/lodestar-beacon-state-transition/lib/util/validator"))
           .with({isAggregatorFromCommitteeLength})
           .toBeUsed();
-        mock(() =>
-          import("@chainsafe/lodestar-beacon-state-transition/lib/phase0/fast/block/isValidIndexedAttestation")
+        mock(
+          () => import("@chainsafe/lodestar-beacon-state-transition/lib/phase0/fast/block/isValidIndexedAttestation")
         )
           .with({isValidIndexedAttestation})
           .toBeUsed();

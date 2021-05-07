@@ -5,7 +5,7 @@
 
 import PeerId from "peer-id";
 import {Method, MethodResponseType, Methods, ReqRespEncoding, RequestId} from "../constants";
-import Multiaddr from "multiaddr";
+import {Multiaddr} from "multiaddr";
 import {networkInterfaces} from "os";
 import {ENR} from "@chainsafe/discv5";
 import MetadataBook from "libp2p/src/peer-store/metadata-book";
@@ -78,6 +78,10 @@ export function isLocalMultiAddr(multiaddr: Multiaddr | undefined): boolean {
   const isIPv4: boolean = tuples[0][0] === 4;
   const family = isIPv4 ? "IPv4" : "IPv6";
   const ip = tuples[0][1];
+
+  if (!ip) {
+    return false;
+  }
 
   const ipStr = isIPv4
     ? Array.from(ip).join(".")

@@ -6,7 +6,7 @@ import {Context, ILogger, TimeoutError, withTimeout} from "@chainsafe/lodestar-u
 import {phase0} from "@chainsafe/lodestar-types";
 import {Method, ReqRespEncoding, REQUEST_TIMEOUT, RpcResponseStatus} from "../../../constants";
 import {onChunk} from "../utils/onChunk";
-import {ILibP2pStream} from "../interface";
+import {MuxedStream} from "libp2p-interfaces/src/stream-muxer/types";
 import {requestDecode} from "../encoders/requestDecode";
 import {responseEncodeError, responseEncodeSuccess} from "../encoders/responseEncode";
 import {ResponseError} from "./errors";
@@ -34,7 +34,7 @@ export type PerformRequestHandler = (
 export async function handleRequest(
   {config, logger, libp2p}: {config: IBeaconConfig; logger: ILogger; libp2p: Libp2p},
   performRequestHandler: PerformRequestHandler,
-  stream: ILibP2pStream,
+  stream: MuxedStream,
   peerId: PeerId,
   method: Method,
   encoding: ReqRespEncoding,
@@ -51,7 +51,7 @@ export async function handleRequest(
     // in case request whose body is a List fails at chunk_i > 0, without breaking out of the for..await..of
     (async function* () {
       try {
-        const requestBody = await withTimeout(
+        const requestBody = (await withTimeout(
           () => pipe(stream.source, requestDecode(config, method, encoding)),
           REQUEST_TIMEOUT,
           signal
@@ -61,9 +61,9 @@ export async function handleRequest(
           } else {
             throw new ResponseError(RpcResponseStatus.INVALID_REQUEST, (e as Error).message);
           }
-        });
+        })) as phase0.BeaconBlocksByRootRequest;
 
-        logger.debug("Resp received request", {...logCtx, requestBody} as Context);
+        logger.debug("Resp received request", ({...logCtx, requestBody} as unknown) as Context);
 
         yield* pipe(
           performRequestHandler(method, requestBody, peerId),

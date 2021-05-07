@@ -16,6 +16,7 @@
     "build:types:watch": "lerna run build:types:watch --parallel",
     "build:watch": "run-p build:lib:watch build:types:watch",
     "lint": "lerna run lint --no-bail",
+    "lint:fix": "lerna run lint:fix --no-bail",
     "check-types": "lerna run check-types --no-bail",
     "coverage": "lerna run coverage --no-bail",
     "test:unit": "lerna run test:unit --no-bail",

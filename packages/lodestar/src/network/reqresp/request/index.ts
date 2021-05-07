@@ -1,4 +1,4 @@
-import LibP2p, {Connection} from "libp2p";
+import LibP2p from "libp2p";
 import {AbortSignal} from "abort-controller";
 import pipe from "it-pipe";
 import PeerId from "peer-id";
@@ -10,7 +10,7 @@ import {createRpcProtocol, getAgentVersionFromPeerStore, prettyPrintPeerId} from
 import {ResponseError} from "../response";
 import {requestEncode} from "../encoders/requestEncode";
 import {responseDecode} from "../encoders/responseDecode";
-import {ILibP2pStream} from "../interface";
+import {MuxedStream} from "libp2p-interfaces/src/stream-muxer/types";
 import {collectResponses} from "./collectResponses";
 import {maxTotalResponseTimeout, responseTimeoutsHandler} from "./responseTimeoutsHandler";
 import {
@@ -72,11 +72,11 @@ export async function sendRequest<T extends phase0.ResponseBody | phase0.Respons
     // DIAL_TIMEOUT: Non-spec timeout from dialing protocol until stream opened
     const stream = await withTimeout(
       async (timeoutAndParentSignal) => {
-        const conn = (await libp2p.dialProtocol(peerId, protocol, {signal: timeoutAndParentSignal})) as Connection;
+        const conn = await libp2p.dialProtocol(peerId, protocol, {signal: timeoutAndParentSignal});
         if (!conn) throw Error("dialProtocol timeout");
         // TODO: libp2p-ts type Stream does not declare .abort() and requires casting to unknown here
         // Remove when https://github.com/ChainSafe/lodestar/issues/2167
-        return ((conn as unknown) as {stream: ILibP2pStream}).stream;
+        return ((conn as unknown) as {stream: MuxedStream}).stream;
       },
       DIAL_TIMEOUT,
       signal
@@ -101,7 +101,7 @@ export async function sendRequest<T extends phase0.ResponseBody | phase0.Respons
       signal
     ).catch((e) => {
       // Must close the stream read side (stream.source) manually AND the write side
-      stream.abort(e);
+      stream.abort();
 
       if (e instanceof TimeoutError) {
         throw new RequestInternalError({code: RequestErrorCode.REQUEST_TIMEOUT});

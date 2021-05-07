@@ -11,7 +11,7 @@ import {testLogger, LogLevel, TestLoggerOpts} from "../../utils/logger";
 import {connect} from "../../utils/network";
 import {Network} from "../../../src/network";
 import {NodeWorkerOptions, Message} from "./types";
-import Multiaddr from "multiaddr";
+import {Multiaddr} from "multiaddr";
 import {sleep, TimestampFormatCode, withTimeout} from "@chainsafe/lodestar-utils";
 import {fromHexString} from "@chainsafe/ssz";
 import {createFromPrivKey} from "peer-id";
@@ -71,7 +71,7 @@ async function runWorker(): Promise<void> {
       nodes.map(async (nodeToConnect, i) => {
         if (i === nodeIndex) return; // Don't dial self
         loggerNode.info(`Connecting node ${nodeIndex} -> ${i}`);
-        const multiaddrs = nodeToConnect.localMultiaddrs.map(Multiaddr);
+        const multiaddrs = nodeToConnect.localMultiaddrs.map((a) => new Multiaddr(a));
         const peerIdToConn = await createFromPrivKey(fromHexString(nodeToConnect.peerIdPrivkey));
         await withTimeout(() => connect(node.network as Network, peerIdToConn, multiaddrs), 10 * 1000);
         loggerNode.info(`Connected node ${nodeIndex} -> ${i}`);

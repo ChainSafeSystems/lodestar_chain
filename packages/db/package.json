@@ -38,6 +38,7 @@
     "@chainsafe/lodestar-config": "^0.20.0",
     "@chainsafe/lodestar-utils": "^0.20.0",
     "@chainsafe/ssz": "^0.8.2",
+    "@types/levelup": "^4.3.1",
     "it-all": "^1.0.2",
     "level": "^6.0.1",
     "levelup": "^4.4.0"

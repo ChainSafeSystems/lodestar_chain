@@ -1,14 +1,14 @@
 /**
  * @module network
  */
-import {Connection} from "libp2p";
+import {HandlerProps} from "libp2p";
 import {IBeaconConfig} from "@chainsafe/lodestar-config";
 import {phase0} from "@chainsafe/lodestar-types";
 import {ILogger} from "@chainsafe/lodestar-utils";
 import {AbortController} from "abort-controller";
 import LibP2p from "libp2p";
 import PeerId from "peer-id";
-import {IReqResp, IReqRespModules, ILibP2pStream} from "./interface";
+import {IReqResp, IReqRespModules} from "./interface";
 import {sendRequest} from "./request";
 import {handleRequest} from "./response";
 import {Method, ReqRespEncoding, timeoutOptions} from "../../constants";
@@ -57,35 +57,32 @@ export class ReqResp implements IReqResp {
     this.controller = new AbortController();
     for (const method of Object.values(Method)) {
       for (const encoding of Object.values(ReqRespEncoding)) {
-        this.libp2p.handle(
-          createRpcProtocol(method, encoding),
-          async ({connection, stream}: {connection: Connection; stream: ILibP2pStream}) => {
-            const peerId = connection.remotePeer;
+        this.libp2p.handle(createRpcProtocol(method, encoding), async ({connection, stream}: HandlerProps) => {
+          const peerId = connection.remotePeer;
 
-            // TODO: Do we really need this now that there is only one encoding?
-            // Remember the prefered encoding of this peer
-            if (method === Method.Status) {
-              this.peerMetadata.encoding.set(peerId, encoding);
-            }
-
-            try {
-              await handleRequest(
-                {config: this.config, logger: this.logger, libp2p: this.libp2p},
-                this.onRequest.bind(this),
-                stream,
-                peerId,
-                method,
-                encoding,
-                this.controller.signal,
-                this.respCount++
-              );
-              // TODO: Do success peer scoring here
-            } catch {
-              // TODO: Do error peer scoring here
-              // Must not throw since this is an event handler
-            }
+          // TODO: Do we really need this now that there is only one encoding?
+          // Remember the prefered encoding of this peer
+          if (method === Method.Status) {
+            this.peerMetadata.encoding.set(peerId, encoding);
           }
-        );
+
+          try {
+            await handleRequest(
+              {config: this.config, logger: this.logger, libp2p: this.libp2p},
+              this.onRequest.bind(this),
+              stream,
+              peerId,
+              method,
+              encoding,
+              this.controller.signal,
+              this.respCount++
+            );
+            // TODO: Do success peer scoring here
+          } catch {
+            // TODO: Do error peer scoring here
+            // Must not throw since this is an event handler
+          }
+        });
       }
     }
   }

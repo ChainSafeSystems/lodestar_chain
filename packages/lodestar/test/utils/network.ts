@@ -2,7 +2,7 @@ import {ENR, Discv5Discovery} from "@chainsafe/discv5";
 import Bootstrap from "libp2p-bootstrap";
 import MDNS from "libp2p-mdns";
 import PeerId from "peer-id";
-import Multiaddr from "multiaddr";
+import {Multiaddr} from "multiaddr";
 import {Network} from "../../src/network";
 import {NodejsNode} from "../../src/network/nodejs";
 import {createPeerId} from "../../src/network";

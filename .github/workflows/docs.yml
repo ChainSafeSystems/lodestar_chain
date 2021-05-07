@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2-beta
         with:
-          node-version: "12.14.1"
+          node-version: "14.16.1"
       - name: Restore dependencies
         uses: actions/cache@master
         id: cache-deps

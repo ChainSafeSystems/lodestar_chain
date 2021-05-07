@@ -10,7 +10,7 @@ import {createKeypairFromPeerId, ENR} from "@chainsafe/discv5/lib";
 import PeerId from "peer-id";
 import {expect, use} from "chai";
 import chaiAsPromised from "chai-as-promised";
-import Multiaddr from "multiaddr";
+import {Multiaddr} from "multiaddr";
 import {MetadataController} from "../../../../../src/network/metadata";
 import {phase0} from "@chainsafe/lodestar-types";
 import {NodePeer} from "../../../../../src/api/types";

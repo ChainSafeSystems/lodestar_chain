@@ -46,9 +46,9 @@ describe("signatureSets", () => {
           getMockAttestations({attestingIndices: [0] as List<ValidatorIndex>, signature: EMPTY_SIGNATURE}),
         ] as List<phase0.Attestation>,
         deposits: ([] as phase0.Deposit[]) as List<phase0.Deposit>,
-        voluntaryExits: [getMockSignedVoluntaryExit({validatorIndex: 0, signature: EMPTY_SIGNATURE})] as List<
-          phase0.SignedVoluntaryExit
-        >,
+        voluntaryExits: [
+          getMockSignedVoluntaryExit({validatorIndex: 0, signature: EMPTY_SIGNATURE}),
+        ] as List<phase0.SignedVoluntaryExit>,
       },
     };
 
@@ -69,9 +69,9 @@ describe("signatureSets", () => {
 
     const state = createCachedBeaconState(
       config,
-      config.types.phase0.BeaconState.createTreeBackedFromStruct(generateState({validators})) as TreeBacked<
-        allForks.BeaconState
-      >
+      config.types.phase0.BeaconState.createTreeBackedFromStruct(
+        generateState({validators})
+      ) as TreeBacked<allForks.BeaconState>
     );
 
     const signatureSets = fast.getAllBlockSignatureSets(state, signedBlock);

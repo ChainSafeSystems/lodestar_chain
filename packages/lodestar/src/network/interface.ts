@@ -3,7 +3,7 @@
  */
 import {Connection} from "libp2p";
 import {ENR} from "@chainsafe/discv5/lib";
-import Multiaddr from "multiaddr";
+import {Multiaddr} from "multiaddr";
 import PeerId from "peer-id";
 import {INetworkEventBus} from "./events";
 import {Eth2Gossipsub} from "./gossip";

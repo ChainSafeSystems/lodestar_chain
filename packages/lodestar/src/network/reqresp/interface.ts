@@ -37,27 +37,3 @@ export type RequestOrResponseType = Exclude<
 >;
 
 export type RequestOrResponseBody = phase0.ResponseBody | phase0.RequestBody;
-
-/**
- * Stream types from libp2p.dialProtocol are too vage and cause compilation type issues
- * These source and sink types are more precise to our usage
- */
-export interface ILibP2pStream {
-  source: AsyncIterable<Buffer>;
-  sink: (source: AsyncIterable<Buffer>) => Promise<void>;
-  /**
-   * `libp2p-mplex`: Close for reading
-   * ```ts
-   * () => stream.source.end()
-   * ```
-   */
-  close: () => void;
-  /**
-   * `libp2p-mplex`: Close immediately for reading and writing (remote error)
-   */
-  reset: () => void;
-  /**
-   * `libp2p-mplex`: Close for reading and writing (local error)
-   */
-  abort: (err: Error) => void;
-}
