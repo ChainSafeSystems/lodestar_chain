@@ -10,7 +10,7 @@ import {BeaconNode} from "../../../src/node";
 import {createNodeJsLibp2p} from "../../../src/network/nodejs";
 import {createPeerId} from "../../../src/network";
 import {defaultNetworkOptions} from "../../../src/network/options";
-import {initDevState} from "../../../src/node/utils/state";
+import {getInteropState, storeDeposits} from "../../../src/node/utils/state";
 import {IBeaconNodeOptions} from "../../../src/node/options";
 import {defaultOptions} from "../../../src/node/options";
 import {BeaconDb} from "../../../src/db";
@@ -20,7 +20,7 @@ import PeerId from "peer-id";
 export async function getDevBeaconNode({
   params,
   options = {},
-  validatorCount = 8,
+  validatorCount,
   genesisTime,
   logger,
   peerId,
@@ -28,7 +28,7 @@ export async function getDevBeaconNode({
 }: {
   params: Partial<IBeaconParams>;
   options?: RecursivePartial<IBeaconNodeOptions>;
-  validatorCount?: number;
+  validatorCount: number;
   genesisTime?: number;
   logger?: ILogger;
   peerId?: PeerId;
@@ -71,13 +71,14 @@ export async function getDevBeaconNode({
     )
   );
 
-  const anchorState = await initDevState(config, db, validatorCount, genesisTime);
+  const {state, deposits} = await getInteropState(config, validatorCount, genesisTime);
+  await storeDeposits(config, db, deposits);
   return await BeaconNode.init({
     opts: options as IBeaconNodeOptions,
     config,
     db,
     logger,
     libp2p,
-    anchorState,
+    anchorState: state,
   });
 }

@@ -15,7 +15,7 @@ import {ILogger, sleep, TimestampFormatCode} from "@chainsafe/lodestar-utils";
 
 /* eslint-disable no-console, @typescript-eslint/naming-convention */
 
-describe("Run multi node single thread interop validators (no eth1) until checkpoint", function () {
+describe("Run multi node single process interop validators (no eth1) until checkpoint", function () {
   const testParams: Pick<IBeaconParams, "SECONDS_PER_SLOT" | "SLOTS_PER_EPOCH"> = {
     SECONDS_PER_SLOT: 3,
     SLOTS_PER_EPOCH: 8,
@@ -38,7 +38,7 @@ describe("Run multi node single thread interop validators (no eth1) until checkp
   let onDoneHandlers: (() => Promise<void>)[] = [];
 
   for (const {nodeCount, validatorsPerNode, event, altairForkEpoch} of testCases) {
-    it(`singleThread ${nodeCount} nodes / ${validatorsPerNode} vc / 1 validator > until ${event}, altairForkEpoch ${altairForkEpoch}`, async function () {
+    it(`single process ${nodeCount} nodes / ${validatorsPerNode} vc / 1 validator > until ${event}, altairForkEpoch ${altairForkEpoch}`, async function () {
       this.timeout("10 min");
 
       const nodes: BeaconNode[] = [];
@@ -51,7 +51,7 @@ describe("Run multi node single thread interop validators (no eth1) until checkp
       for (let i = 0; i < nodeCount; i++) {
         const testLoggerOpts: TestLoggerOpts = {
           logLevel: LogLevel.info,
-          logFile: `${logFilesDir}/singlethread_multinode_altair-${altairForkEpoch}.log`,
+          logFile: `${logFilesDir}/singleprocess_multinode_altair-${altairForkEpoch}.log`,
           timestampFormat: {
             format: TimestampFormatCode.EpochSlot,
             genesisTime,

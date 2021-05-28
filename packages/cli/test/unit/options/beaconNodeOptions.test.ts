@@ -13,6 +13,7 @@ describe("options / beaconNodeOptions", () => {
       "api.rest.host": "127.0.0.1",
       "api.rest.port": 7654,
 
+      "chain.runChainStatusNotifier": true,
       "chain.useSingleThreadVerifier": true,
 
       "eth1.enabled": true,
@@ -50,6 +51,7 @@ describe("options / beaconNodeOptions", () => {
         },
       },
       chain: {
+        runChainStatusNotifier: true,
         useSingleThreadVerifier: true,
       },
       eth1: {

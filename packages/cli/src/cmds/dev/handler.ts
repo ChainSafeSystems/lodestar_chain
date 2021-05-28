@@ -55,8 +55,10 @@ export async function devHandler(args: IDevArgs & IGlobalArgs): Promise<void> {
 
   let anchorState;
   if (args.genesisValidators) {
-    anchorState = await nodeUtils.initDevState(config, db, args.genesisValidators);
-    nodeUtils.storeSSZState(config, anchorState, path.join(args.rootDir, "dev", "genesis.ssz"));
+    const interop = await nodeUtils.getInteropState(config, args.genesisValidators);
+    await nodeUtils.storeDeposits(config, db, interop.deposits);
+    await nodeUtils.storeSSZState(config, interop.state, path.join(args.rootDir, "dev", "genesis.ssz"));
+    anchorState = interop.state;
   } else if (args.genesisStateFile) {
     anchorState = await initStateFromAnchorState(
       config,

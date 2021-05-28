@@ -7,13 +7,13 @@ import {getClient, Api} from "@chainsafe/lodestar-api";
 import {Clock, IClock} from "./util/clock";
 import {signAndSubmitVoluntaryExit} from "./voluntaryExit";
 import {waitForGenesis} from "./genesis";
-import {ForkService} from "./services/fork";
 import {ValidatorStore} from "./services/validatorStore";
 import {BlockProposingService} from "./services/block";
 import {AttestationService} from "./services/attestation";
 import {IndicesService} from "./services/indices";
 import {SyncCommitteeService} from "./services/syncCommittee";
 import {ISlashingProtection} from "./slashingProtection";
+import {assertEqualParams} from "./util/params";
 
 export type ValidatorOptions = {
   slashingProtection: ISlashingProtection;
@@ -59,8 +59,7 @@ export class Validator {
         : opts.api;
 
     const clock = new Clock(config, logger, {genesisTime: Number(genesis.genesisTime)});
-    const forkService = new ForkService(api, logger, clock);
-    const validatorStore = new ValidatorStore(config, forkService, slashingProtection, secretKeys, genesis);
+    const validatorStore = new ValidatorStore(config, slashingProtection, secretKeys, genesis);
     const indicesService = new IndicesService(logger, api, validatorStore);
     new BlockProposingService(config, logger, api, clock, validatorStore, graffiti);
     new AttestationService(config, logger, api, clock, validatorStore, indicesService);
@@ -79,8 +78,14 @@ export class Validator {
       typeof opts.api === "string"
         ? getClient(opts.config, {baseUrl: opts.api, timeoutMs: 12000, getAbortSignal: () => signal})
         : opts.api;
+
     const genesis = await waitForGenesis(api, opts.logger, signal);
     opts.logger.info("Genesis available");
+
+    const {data: nodeParams} = await api.config.getSpec();
+    assertEqualParams(opts.config.params, nodeParams);
+    opts.logger.info("Verified node and validator have same config");
+
     return new Validator(opts, genesis);
   }
 

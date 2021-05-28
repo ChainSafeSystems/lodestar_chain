@@ -27,6 +27,7 @@ export async function validatorHandler(args: IValidatorCliArgs & IGlobalArgs): P
   const config = getBeaconConfigFromArgs(args);
 
   const logger = getCliLogger(args, beaconPaths, config);
+  logger.info("Lodestar validator", {network: args.network, preset: args.preset});
 
   const secretKeys = await getSecretKeys(args);
   if (secretKeys.length === 0) throw new YargsError("No validator keystores found");

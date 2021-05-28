@@ -28,22 +28,22 @@ jobs:
         if: steps.cache-deps.outputs.cache-hit == 'true'
       # </common-build>
 
-      - name: Simulation single thread single node test
-        run: yarn test:sim:singleThread
-        working-directory: packages/lodestar
-      - name: Simulation single thread multi node test
-        run: yarn test:sim:singleThreadMultiNode
-        working-directory: packages/lodestar
-      - name: Simulation multi thread multi node test phase0
-        run: yarn test:sim:multiThread
+      # - name: Simulation single process single node test
+      #   run: yarn test:sim:singleProcess
+      #   working-directory: packages/lodestar
+      # - name: Simulation single process multi node test
+      #   run: yarn test:sim:singleProcessMultiNode
+      #   working-directory: packages/lodestar
+      - name: Simulation multi process multi node test phase0
+        run: yarn test:sim:multiProcess
         working-directory: packages/lodestar
         env: {RUN_ONLY_SIM_TEST: phase0}
-      - name: Simulation multi thread multi node test altair epoch genesis
-        run: yarn test:sim:multiThread
+      - name: Simulation multi process multi node test altair epoch genesis
+        run: yarn test:sim:multiProcess
         working-directory: packages/lodestar
         env: {RUN_ONLY_SIM_TEST: altair-genesis}
-      - name: Simulation multi thread multi node test altair epoch 2
-        run: yarn test:sim:multiThread
+      - name: Simulation multi process multi node test altair epoch 2
+        run: yarn test:sim:multiProcess
         working-directory: packages/lodestar
         env: {RUN_ONLY_SIM_TEST: altair-epoch2}
       - name: Upload debug log test files

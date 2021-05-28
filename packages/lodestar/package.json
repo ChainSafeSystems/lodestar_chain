@@ -40,9 +40,9 @@
     "test:unit": "nyc --cache-dir .nyc_output/.cache -e .ts mocha 'test/unit/**/*.test.ts'",
     "test:e2e": "mocha 'test/e2e/**/*.test.ts'",
     "test:sim": "mocha 'test/sim/**/*.test.ts'",
-    "test:sim:singleThread": "mocha 'test/sim/singleNodeSingleThread.test.ts'",
-    "test:sim:singleThreadMultiNode": "mocha 'test/sim/multiNodeSingleThread.test.ts'",
-    "test:sim:multiThread": "mocha 'test/sim/multiNodeMultiThread.test.ts'"
+    "test:sim:singleProcess": "mocha 'test/sim/singleNodeSingleProcess.test.ts'",
+    "test:sim:singleProcessMultiNode": "mocha 'test/sim/multiNodeSingleProcess.test.ts'",
+    "test:sim:multiProcess": "mocha 'test/sim/multiNodeMultiProcess.test.ts'"
   },
   "dependencies": {
     "@chainsafe/bls": "6.0.1",

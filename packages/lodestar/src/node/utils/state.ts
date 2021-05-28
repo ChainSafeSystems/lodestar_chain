@@ -1,35 +1,33 @@
+import fs from "fs";
+import path from "path";
 import {IBeaconConfig} from "@chainsafe/lodestar-config";
 import {allForks, phase0} from "@chainsafe/lodestar-types";
 import {interopDeposits} from "./interop/deposits";
-import {getInteropState} from "./interop/state";
-import {mkdirSync, writeFileSync} from "fs";
-import {dirname} from "path";
+import {getInteropStateFromDeposits} from "./interop/state";
 import {IBeaconDb} from "../../db";
 import {TreeBacked} from "@chainsafe/ssz";
 
-export async function initDevState(
+export async function getInteropState(
   config: IBeaconConfig,
-  db: IBeaconDb,
   validatorCount: number,
   genesisTime?: number
-): Promise<TreeBacked<allForks.BeaconState>> {
+): Promise<{state: TreeBacked<allForks.BeaconState>; deposits: phase0.Deposit[]}> {
   const deposits = interopDeposits(config, config.types.phase0.DepositDataRootList.defaultTreeBacked(), validatorCount);
-  await storeDeposits(config, db, deposits);
-  const state = getInteropState(
-    config,
-    await db.depositDataRoot.getTreeBacked(validatorCount - 1),
-    genesisTime || Math.floor(Date.now() / 1000),
-    deposits
-  );
-  return state;
+
+  const state = getInteropStateFromDeposits(config, genesisTime || Math.floor(Date.now() / 1000), deposits);
+  return {state, deposits};
 }
 
-export function storeSSZState(config: IBeaconConfig, state: TreeBacked<allForks.BeaconState>, path: string): void {
-  mkdirSync(dirname(path), {recursive: true});
-  writeFileSync(path, config.getForkTypes(state.slot).BeaconState.serialize(state));
+export async function storeSSZState(
+  config: IBeaconConfig,
+  state: TreeBacked<allForks.BeaconState>,
+  filepath: string
+): Promise<void> {
+  fs.mkdirSync(path.dirname(filepath), {recursive: true});
+  await fs.promises.writeFile(filepath, config.getForkTypes(state.slot).BeaconState.serialize(state));
 }
 
-async function storeDeposits(config: IBeaconConfig, db: IBeaconDb, deposits: phase0.Deposit[]): Promise<void> {
+export async function storeDeposits(config: IBeaconConfig, db: IBeaconDb, deposits: phase0.Deposit[]): Promise<void> {
   for (let i = 0; i < deposits.length; i++) {
     await Promise.all([
       db.depositEvent.put(i, {

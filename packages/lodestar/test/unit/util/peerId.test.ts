@@ -3,7 +3,7 @@ import {createFromPrivKey} from "peer-id";
 import {fromHexString, toHexString} from "@chainsafe/ssz";
 import {createPeerId} from "../../../src/network";
 
-describe("PeerId util - for multithread sim test", () => {
+describe("PeerId util - for multiprocess sim test", () => {
   it("Should serialize and deserialize privKey", async () => {
     const peerId = await createPeerId();
     const privKey = peerId.marshalPrivKey();

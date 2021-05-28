@@ -1,5 +1,10 @@
 import {SecretKey} from "@chainsafe/bls";
-import {computeDomain, computeEpochAtSlot, computeSigningRoot} from "@chainsafe/lodestar-beacon-state-transition";
+import {
+  computeDomain,
+  computeEpochAtSlot,
+  computeSigningRoot,
+  computeStartSlotAtEpoch,
+} from "@chainsafe/lodestar-beacon-state-transition";
 import {IBeaconConfig} from "@chainsafe/lodestar-config";
 import {
   allForks,
@@ -17,7 +22,6 @@ import {List, toHexString} from "@chainsafe/ssz";
 import {routes} from "@chainsafe/lodestar-api";
 import {ISlashingProtection} from "../slashingProtection";
 import {BLSKeypair, PubkeyHex} from "../types";
-import {IForkService} from "./fork";
 import {getAggregationBits, mapSecretKeysToValidators} from "./utils";
 
 /**
@@ -29,7 +33,6 @@ export class ValidatorStore {
 
   constructor(
     private readonly config: IBeaconConfig,
-    private readonly forkService: IForkService,
     private readonly slashingProtection: ISlashingProtection,
     secretKeys: SecretKey[],
     genesis: Genesis
@@ -233,11 +236,12 @@ export class ValidatorStore {
   }
 
   private async getDomain(domainType: DomainType, epoch: Epoch): Promise<Buffer> {
-    const fork = await this.forkService.getFork();
-    // TODO: Abstract this logic into the config but use the fork object provided by the beacon node
-    // The fork object MUST be fetched from the beacon node. If the validator client is run in a different
-    // fork than the node all signatures from the validator will be rejected as invalid.
-    const forkVersion = epoch < fork.epoch ? fork.previousVersion : fork.currentVersion;
+    // We don't fetch the Fork from the beacon node dynamically.
+    // The Fork object should not change during the runtime of the validator. When a new planned fork happens
+    // node operators would have to update the validator client software at least once.
+    // If we wanted to have long-term independent validator client we can review this approach.
+    // On start-up the validator client fetches the full config from the beacon node and ensures they match.
+    const forkVersion = this.config.getForkVersion(computeStartSlotAtEpoch(this.config, epoch));
     return computeDomain(this.config, domainType, forkVersion, this.genesisValidatorsRoot);
   }
 

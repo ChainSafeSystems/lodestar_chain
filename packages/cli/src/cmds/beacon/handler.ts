@@ -41,12 +41,11 @@ export async function beaconHandler(args: IBeaconArgs & IGlobalArgs): Promise<vo
 
   const abortController = new AbortController();
   const logger = getCliLogger(args, beaconPaths, config);
+  logger.info("Lodestar", {version: lodestarGitData.version, network: args.network, preset: args.preset});
 
   onGracefulShutdown(async () => {
     abortController.abort();
   }, logger.info.bind(logger));
-
-  logger.info("Lodestar", {version: lodestarGitData.version, network: args.network});
 
   const db = new BeaconDb({
     config,

@@ -21,6 +21,7 @@ import {TasksService} from "../tasks";
 import {IBeaconNodeOptions} from "./options";
 import {Eth1ForBlockProduction, Eth1ForBlockProductionDisabled, Eth1Provider} from "../eth1";
 import {runNodeNotifier} from "./notifier";
+import {simTestInfoTracker} from "./utils/simTest";
 
 export * from "./options";
 
@@ -204,7 +205,7 @@ export class BeaconNode {
 
     void runNodeNotifier({network, chain, sync, config, logger, signal});
 
-    return new this({
+    const bn = new this({
       opts,
       config,
       db,
@@ -218,6 +219,13 @@ export class BeaconNode {
       chores,
       controller,
     }) as T;
+
+    if (opts.chain.runChainStatusNotifier) {
+      const onStop = simTestInfoTracker(bn, logger);
+      controller.signal.addEventListener("abort", onStop);
+    }
+
+    return bn;
   }
 
   /**
