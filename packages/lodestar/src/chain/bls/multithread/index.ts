@@ -279,7 +279,10 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
         const job = jobs[i];
         const jobResult = results[i];
         const sigSetCount = job.workReq.sets.length;
-        if (jobResult.code === WorkResultCode.success) {
+        if (!jobResult) {
+          job.reject(Error(`No jobResult for index ${i}`));
+          errorCount += sigSetCount;
+        } else if (jobResult.code === WorkResultCode.success) {
           job.resolve(jobResult.result);
           successCount += sigSetCount;
         } else {
