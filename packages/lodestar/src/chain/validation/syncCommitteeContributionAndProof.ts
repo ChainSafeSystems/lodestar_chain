@@ -67,7 +67,7 @@ export async function validateSyncCommitteeGossipContributionAndProof(
     getSyncCommitteeContributionSignatureSet(headState as CachedBeaconState<altair.BeaconState>, contribution),
   ];
 
-  if (!(await chain.bls.verifySignatureSets(signatureSets))) {
+  if (!(await chain.bls.verifySignatureSets(signatureSets, {batchable: true}))) {
     throw new SyncCommitteeError(GossipAction.REJECT, {
       code: SyncCommitteeErrorCode.INVALID_SIGNATURE,
     });

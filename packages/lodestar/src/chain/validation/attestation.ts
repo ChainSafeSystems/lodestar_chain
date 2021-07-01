@@ -139,7 +139,7 @@ export async function validateGossipAttestation(
     signature: attestation.signature,
   };
   const signatureSet = getIndexedAttestationSignatureSet(attestationTargetState, indexedAttestation);
-  if (!(await chain.bls.verifySignatureSets([signatureSet]))) {
+  if (!(await chain.bls.verifySignatureSets([signatureSet], {batchable: true}))) {
     throw new AttestationError(GossipAction.REJECT, {code: AttestationErrorCode.INVALID_SIGNATURE});
   }
 

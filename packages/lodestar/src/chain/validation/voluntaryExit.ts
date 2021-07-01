@@ -30,7 +30,7 @@ export async function validateGossipVoluntaryExit(
   }
 
   const signatureSet = allForks.getVoluntaryExitSignatureSet(state, voluntaryExit);
-  if (!(await chain.bls.verifySignatureSets([signatureSet]))) {
+  if (!(await chain.bls.verifySignatureSets([signatureSet], {batchable: true}))) {
     throw new VoluntaryExitError(GossipAction.REJECT, {
       code: VoluntaryExitErrorCode.INVALID,
       error: Error("Invalid signature"),

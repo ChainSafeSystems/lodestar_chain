@@ -35,7 +35,7 @@ export async function validateGossipAttesterSlashing(
   }
 
   const signatureSets = allForks.getAttesterSlashingSignatureSets(state, attesterSlashing);
-  if (!(await chain.bls.verifySignatureSets(signatureSets))) {
+  if (!(await chain.bls.verifySignatureSets(signatureSets, {batchable: true}))) {
     throw new AttesterSlashingError(GossipAction.REJECT, {
       code: AttesterSlashingErrorCode.INVALID,
       error: Error("Invalid signature"),

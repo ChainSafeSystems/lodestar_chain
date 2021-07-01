@@ -105,7 +105,7 @@ export async function validateGossipAggregateAndProof(
     getAggregateAndProofSignatureSet(targetState, attEpoch, aggregator, signedAggregateAndProof),
     allForks.getIndexedAttestationSignatureSet(targetState, indexedAttestation),
   ];
-  if (!(await chain.bls.verifySignatureSets(signatureSets))) {
+  if (!(await chain.bls.verifySignatureSets(signatureSets, {batchable: true}))) {
     throw new AttestationError(GossipAction.REJECT, {code: AttestationErrorCode.INVALID_SIGNATURE});
   }
 

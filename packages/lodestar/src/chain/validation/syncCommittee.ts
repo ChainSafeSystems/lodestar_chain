@@ -56,7 +56,7 @@ export async function validateSyncCommitteeSigOnly(
   syncCommittee: altair.SyncCommitteeMessage
 ): Promise<void> {
   const signatureSet = getSyncCommitteeSignatureSet(headState, syncCommittee);
-  if (!(await chain.bls.verifySignatureSets([signatureSet]))) {
+  if (!(await chain.bls.verifySignatureSets([signatureSet], {batchable: true}))) {
     throw new SyncCommitteeError(GossipAction.REJECT, {
       code: SyncCommitteeErrorCode.INVALID_SIGNATURE,
     });
