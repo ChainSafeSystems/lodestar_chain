@@ -1,5 +1,9 @@
 import {ISignatureSet} from "@chainsafe/lodestar-beacon-state-transition/src";
 
+export type VerifySignatureOpts = {
+  batchable?: boolean;
+};
+
 export interface IBlsVerifier {
   /**
    * Verify 1 or more signature sets. Sets may be verified on batch or not depending on their count
@@ -21,8 +25,6 @@ export interface IBlsVerifier {
    * Public keys have already been checked for subgroup and infinity
    * Signatures have already been checked for subgroup
    * Signature checks above could be done here for convienence as well
-   *
-   * @param validateSignature defaults to true
    */
-  verifySignatureSets(sets: ISignatureSet[], validateSignature?: boolean): Promise<boolean>;
+  verifySignatureSets(sets: ISignatureSet[], opts?: VerifySignatureOpts): Promise<boolean>;
 }

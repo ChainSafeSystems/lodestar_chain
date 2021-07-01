@@ -29,9 +29,7 @@ describe("chain / bls / multithread queue", function () {
     }
 
     const pool = new BlsMultiThreadWorkerPool({logger, metrics: null, signal: controller.signal});
-    const isValidArr = await Promise.all(
-      Array.from({length: 8}, (i) => i).map(() => pool.verifySignatureSets(sets, true))
-    );
+    const isValidArr = await Promise.all(Array.from({length: 8}, (i) => i).map(() => pool.verifySignatureSets(sets)));
     for (const [i, isValid] of isValidArr.entries()) {
       expect(isValid).to.equal(true, `sig set ${i} returned invalid`);
     }
