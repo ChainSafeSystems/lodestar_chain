@@ -24,6 +24,7 @@ export type BlsMultiThreadWorkerPoolModules = {
 
 /**
  * Split big signature sets into smaller sets so they can be sent to multiple workers.
+ *
  * The biggest sets happen during sync, on mainnet batches of 64 blocks have around ~8000 signatures.
  * The latency cost of sending the job to and from the worker is aprox a single sig verification.
  * If you split a big signature into 2, the extra time cost is `(2+2N)/(1+2N)`.
@@ -31,11 +32,26 @@ export type BlsMultiThreadWorkerPoolModules = {
  */
 const MAX_SIGNATURE_SETS_PER_JOB = 128;
 
+/**
+ * If there are more than `MAX_BUFFERED_SIGS` buffered sigs, verify them immediatelly without waiting `MAX_BUFFER_WAIT_MS`.
+ *
+ * The efficency improvement of batching sets asymptotically reaches x2. However, for batching large sets
+ * has more risk in case a signature is invalid, requiring to revalidate all sets in the batch. 32 is sweet
+ * point for this tradeoff.
+ */
 const MAX_BUFFERED_SIGS = 32;
+/**
+ * Gossip objects usually come in bursts. Buffering them for a short period of time allows to increase batching
+ * efficieny, at the cost of delaying validation. Unless running in production shows otherwise, it's not critical
+ * to hold attestations and aggregates for 100ms. Lodestar existing queues may hold those objects for much more anyway.
+ *
+ * There's no exact reasoning for the `100` miliseconds number. The metric `batchSigsSuccess` should indicate if this
+ * value needs revision
+ */
 const MAX_BUFFER_WAIT_MS = 100;
 
 type WorkerApi = {
-  doManyBlsWorkReq(workReqArr: BlsWorkReq[]): Promise<BlsWorkResult>;
+  verifyManySignatureSets(workReqArr: BlsWorkReq[]): Promise<BlsWorkResult>;
 };
 
 type JobQueueItem<R = boolean> = {
@@ -201,6 +217,8 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
     return await new Promise<boolean>((resolve, reject) => {
       const job = {resolve, reject, addedTimeMs: Date.now(), workReq};
 
+      // Append batchable sets to `bufferedJobs`, starting a timeout to push them into `jobs`.
+      // Do not call `runJob()`, it is called from `runBufferedJobs()`
       if (workReq.opts.batchable) {
         if (!this.bufferedJobs) {
           this.bufferedJobs = {
@@ -216,11 +234,15 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
           clearTimeout(this.bufferedJobs.timeout);
           this.runBufferedJobs();
         }
-      } else {
-        this.jobs.push(job);
       }
 
-      setTimeout(this.runJob, 0);
+      // Push job and schedule to call `runJob` in the next macro event loop cycle.
+      // This is usefull to allow batching job submited from a syncronous for loop,
+      // and to prevent large stacks since runJob may be called recursively.
+      else {
+        this.jobs.push(job);
+        setTimeout(this.runJob, 0);
+      }
     });
   }
 
@@ -267,7 +289,7 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
       // Only downside is the the job promise may be resolved twice, but that's not an issue
 
       const jobStartNs = process.hrtime.bigint();
-      const workResult = await workerApi.doManyBlsWorkReq(jobs.map((job) => job.workReq));
+      const workResult = await workerApi.verifyManySignatureSets(jobs.map((job) => job.workReq));
       const jobEndNs = process.hrtime.bigint();
       const {workerId, batchRetries, batchSigsSuccess, workerStartNs, workerEndNs, results} = workResult;
 
@@ -339,6 +361,9 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
     return jobs;
   }
 
+  /**
+   * Add all buffered jobs to the job queue and potentially run them immediatelly
+   */
   private runBufferedJobs = (): void => {
     if (this.bufferedJobs) {
       this.jobs.push(...this.bufferedJobs.jobs);
@@ -352,8 +377,10 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
    */
   private terminateAllWorkers = (): void => {
     for (const [id, worker] of this.workers.entries()) {
-      worker.worker.terminate((error, exitCode = 0) => {
-        if (error) this.logger.error("Error terminating worker", {id, exitCode}, error);
+      // NOTE: 'threads' has not yet updated types, and NodeJS complains with
+      // [DEP0132] DeprecationWarning: Passing a callback to worker.terminate() is deprecated. It returns a Promise instead.
+      ((worker.worker.terminate() as unknown) as Promise<void>).catch((e) => {
+        if (e) this.logger.error("Error terminating worker", {id}, e);
       });
     }
   };
@@ -364,4 +391,15 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
       if (job) job.reject(new QueueError({code: QueueErrorCode.QUEUE_ABORTED}));
     }
   };
+
+  /** For testing */
+  private async waitTillInitialized(): Promise<void> {
+    await Promise.all(
+      this.workers.map(async (worker) => {
+        if (worker.status.code === WorkerStatusCode.initializing) {
+          await worker.status.initPromise;
+        }
+      })
+    );
+  }
 }

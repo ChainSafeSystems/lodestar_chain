@@ -22,69 +22,74 @@ if (!workerData) throw Error("workerData must be defined");
 const {implementation, workerId} = workerData || {};
 
 expose({
-  async doManyBlsWorkReq(workReqArr: BlsWorkReq[]): Promise<BlsWorkResult> {
+  async verifyManySignatureSets(workReqArr: BlsWorkReq[]): Promise<BlsWorkResult> {
     await init(implementation);
-    return doManyBlsWorkReq(workReqArr);
+    return verifyManySignatureSets(workReqArr);
   },
 });
 
-function doManyBlsWorkReq(workReqArr: BlsWorkReq[]): BlsWorkResult {
+function verifyManySignatureSets(workReqArr: BlsWorkReq[]): BlsWorkResult {
   const startNs = process.hrtime.bigint();
   const results: WorkResult<boolean>[] = [];
   let batchRetries = 0;
   let batchSigsSuccess = 0;
 
   // If there are multiple batchable sets attempt batch verification with them
-  const batchable: {idx: number; workReq: BlsWorkReq}[] = [];
-  const nonBatchable: {idx: number; workReq: BlsWorkReq}[] = [];
+  const batchableSets: {idx: number; sets: SignatureSetDeserialized[]}[] = [];
+  const nonBatchableSets: {idx: number; sets: SignatureSetDeserialized[]}[] = [];
 
+  // Split sets between batchable and non-batchable preserving their original index in the req array
   for (let i = 0; i < workReqArr.length; i++) {
     const workReq = workReqArr[i];
+    const sets = workReq.sets.map(deserializeSet);
+
     if (workReq.opts.batchable) {
-      batchable.push({idx: i, workReq});
+      batchableSets.push({idx: i, sets});
     } else {
-      nonBatchable.push({idx: i, workReq});
+      nonBatchableSets.push({idx: i, sets});
     }
   }
 
-  if (batchable.length > 0) {
+  if (batchableSets.length > 0) {
     // Split batchable into chunks of max size ~ 32 to minimize cost if a sig is wrong
-    const batchableChunks = chunkifyMaximizeChunkSize(batchable, BATCHABLE_MIN_PER_CHUNK);
+    const batchableChunks = chunkifyMaximizeChunkSize(batchableSets, BATCHABLE_MIN_PER_CHUNK);
 
     for (const batchableChunk of batchableChunks) {
       const allSets: SignatureSetDeserialized[] = [];
-      for (const {workReq} of batchableChunk) {
-        for (const set of workReq.sets) {
-          allSets.push(deserializeSet(set));
+      for (const {sets} of batchableChunk) {
+        for (const set of sets) {
+          allSets.push(set);
         }
       }
 
       try {
+        // Attempt to verify multiple sets at once
         const isValid = verifySignatureSetsMaybeBatch(allSets);
 
         if (isValid) {
-          // The entire batch is valid
-          for (const {idx, workReq} of batchableChunk) {
-            batchSigsSuccess += workReq.sets.length;
+          // The entire batch is valid, return success to all
+          for (const {idx, sets} of batchableChunk) {
+            batchSigsSuccess += sets.length;
             results[idx] = {code: WorkResultCode.success, result: isValid};
           }
         } else {
           batchRetries++;
           // Re-verify all sigs
-          nonBatchable.push(...batchableChunk);
+          nonBatchableSets.push(...batchableChunk);
         }
       } catch (e) {
-        // Return error to the main thread so it can be visible
-        for (const {idx} of batchableChunk) {
-          results[idx] = {code: WorkResultCode.error, error: e as Error};
-        }
+        // TODO: Ignore this error expecting that the same error will happen when re-verifying the set individually
+        //       It's not ideal but '@chainsafe/blst' may throw errors on some conditions
+        batchRetries++;
+        // Re-verify all sigs
+        nonBatchableSets.push(...batchableChunk);
       }
     }
   }
 
-  for (const {idx, workReq} of nonBatchable) {
+  for (const {idx, sets} of nonBatchableSets) {
     try {
-      const isValid = verifySignatureSetsMaybeBatch(workReq.sets.map(deserializeSet));
+      const isValid = verifySignatureSetsMaybeBatch(sets);
       results[idx] = {code: WorkResultCode.success, result: isValid};
     } catch (e) {
       results[idx] = {code: WorkResultCode.error, error: e as Error};
