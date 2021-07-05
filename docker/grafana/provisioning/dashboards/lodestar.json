@@ -3330,7 +3330,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "delta(lodestar_bls_thread_pool_batch_retries[$__rate_interval])",
+              "expr": "rate(lodestar_bls_thread_pool_batch_retries[$__rate_interval])",
               "interval": "",
               "legendFormat": "pool",
               "refId": "A"
