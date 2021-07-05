@@ -281,8 +281,8 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
       }
 
       this.metrics?.blsThreadPool.totalJobsGroupsStarted.inc(1);
-      this.metrics?.blsThreadPool.totalJobsStarted.inc(jobs.length);
-      this.metrics?.blsThreadPool.totalSigSetsStarted.inc(startedSigSets);
+      if (jobs.length > 0) this.metrics?.blsThreadPool.totalJobsStarted.inc(jobs.length);
+      if (startedSigSets > 0) this.metrics?.blsThreadPool.totalSigSetsStarted.inc(startedSigSets);
 
       // Send work package to the worker
       // If the job, metrics or any code below throws: the job will reject never going stale.
@@ -319,13 +319,13 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
       const latencyToWorkerSec = Number(workerStartNs - jobStartNs) / 1e9;
       const latencyFromWorkerSec = Number(jobEndNs - workerEndNs) / 1e9;
 
-      this.metrics?.blsThreadPool.jobsWorkerTime.inc({workerId}, workerJobTimeSec);
+      if (workerJobTimeSec > 0) this.metrics?.blsThreadPool.jobsWorkerTime.inc({workerId}, workerJobTimeSec);
       this.metrics?.blsThreadPool.latencyToWorker.observe(latencyToWorkerSec);
       this.metrics?.blsThreadPool.latencyFromWorker.observe(latencyFromWorkerSec);
-      this.metrics?.blsThreadPool.successJobsSignatureSetsCount.inc(successCount);
-      this.metrics?.blsThreadPool.errorJobsSignatureSetsCount.inc(errorCount);
-      this.metrics?.blsThreadPool.batchRetries.inc(batchRetries);
-      this.metrics?.blsThreadPool.batchSigsSuccess.inc(batchSigsSuccess);
+      if (successCount > 0) this.metrics?.blsThreadPool.successJobsSignatureSetsCount.inc(successCount);
+      if (errorCount > 0) this.metrics?.blsThreadPool.errorJobsSignatureSetsCount.inc(errorCount);
+      if (batchRetries > 0) this.metrics?.blsThreadPool.batchRetries.inc(batchRetries);
+      if (batchSigsSuccess > 0) this.metrics?.blsThreadPool.batchSigsSuccess.inc(batchSigsSuccess);
     } catch (e) {
       // Worker communications should never reject
       if (!this.signal.aborted) this.logger.error("BlsMultiThreadWorkerPool error", {}, e);
