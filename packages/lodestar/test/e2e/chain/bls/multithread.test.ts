@@ -88,7 +88,7 @@ describe("chain / bls / multithread queue", function () {
       isValidPromiseArr.push(pool.verifySignatureSets(sets, {batchable: true}));
     }
 
-    await expect(isInvalidPromise).to.rejectedWith("BLST_ERROR: bad point encoding");
+    await expect(isInvalidPromise).to.rejectedWith("BLST_ERROR");
 
     const isValidArr = await Promise.all(isValidPromiseArr);
     for (const [i, isValid] of isValidArr.entries()) {
