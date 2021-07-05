@@ -2741,11 +2741,50 @@
       "id": 92,
       "panels": [
         {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {},
+              "custom": {},
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 24,
+            "x": 0,
+            "y": 21
+          },
+          "id": 154,
+          "options": {
+            "content": "Verifies signature sets in a thread pool of workers. Must ensure that signatures are verified fast and efficiently.",
+            "mode": "markdown"
+          },
+          "pluginVersion": "7.4.5",
+          "targets": [
+            {
+              "expr": "rate(lodestar_bls_thread_pool_time_seconds_sum[$__rate_interval])",
+              "interval": "",
+              "legendFormat": "{{workerId}}",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "About",
+          "type": "text"
+        },
+        {
           "aliasColors": {},
           "bars": false,
           "dashLength": 10,
           "dashes": false,
           "datasource": null,
+          "description": "Utilization rate = total CPU time per worker per second. Graph is stacked. This ratios should be high since BLS verification is the limiting factor in the node's throughput.",
           "fieldConfig": {
             "defaults": {
               "color": {},
@@ -2764,7 +2803,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 21
+            "y": 24
           },
           "hiddenSeries": false,
           "id": 94,
@@ -2794,7 +2833,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(lodestar_bls_thread_pool_success_time_seconds_sum[$__rate_interval])",
+              "expr": "rate(lodestar_bls_thread_pool_time_seconds_sum[$__rate_interval])",
               "interval": "",
               "legendFormat": "{{workerId}}",
               "refId": "A"
@@ -2804,7 +2843,7 @@
           "timeFrom": null,
           "timeRegions": [],
           "timeShift": null,
-          "title": "BLS thread pool utilization rate",
+          "title": "BLS thread pool - utilization rate",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -2843,6 +2882,7 @@
         },
         {
           "datasource": null,
+          "description": "Raw throughput of the thread pool. How many individual signature sets are successfully validated per second",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -2853,7 +2893,7 @@
                 "axisPlacement": "auto",
                 "barAlignment": 0,
                 "drawStyle": "line",
-                "fillOpacity": 10,
+                "fillOpacity": 23,
                 "gradientMode": "opacity",
                 "hideFrom": {
                   "graph": false,
@@ -2883,7 +2923,7 @@
                   }
                 ]
               },
-              "unit": "s"
+              "unit": "none"
             },
             "overrides": []
           },
@@ -2891,9 +2931,9 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 21
+            "y": 24
           },
-          "id": 95,
+          "id": 96,
           "options": {
             "graph": {},
             "legend": {
@@ -2908,7 +2948,7 @@
           "pluginVersion": "7.4.5",
           "targets": [
             {
-              "expr": "delta(lodestar_bls_thread_pool_queue_job_wait_time_seconds_sum[$__rate_interval])/delta(lodestar_bls_thread_pool_queue_job_wait_time_seconds_count[$__rate_interval])",
+              "expr": "rate(lodestar_bls_thread_pool_success_jobs_signature_sets_count[$__rate_interval])",
               "interval": "",
               "legendFormat": "pool",
               "refId": "A"
@@ -2916,11 +2956,12 @@
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "BLS thread pool job wait time",
+          "title": "BLS thread pool - sig sets / sec",
           "type": "timeseries"
         },
         {
           "datasource": null,
+          "description": "Average sync time to validate a single signature set. Note that the set may have been verified in batch. In most normal hardware this value should be ~1-2ms",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -2969,9 +3010,9 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 29
+            "y": 32
           },
-          "id": 96,
+          "id": 151,
           "options": {
             "graph": {},
             "legend": {
@@ -2986,7 +3027,7 @@
           "pluginVersion": "7.4.5",
           "targets": [
             {
-              "expr": "sum(delta(lodestar_bls_thread_pool_success_time_seconds_sum[$__rate_interval]))/sum(delta(lodestar_bls_thread_pool_success_jobs_signature_sets_count[$__rate_interval]))",
+              "expr": "sum(delta(lodestar_bls_thread_pool_time_seconds_sum[$__rate_interval]))/sum(delta(lodestar_bls_thread_pool_success_jobs_signature_sets_count[$__rate_interval]))",
               "interval": "",
               "legendFormat": "pool",
               "refId": "A"
@@ -2994,11 +3035,532 @@
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "BLS thread pool signature set verification time / set",
+          "title": "BLS thread pool - sig set verification time / set",
           "type": "timeseries"
         },
         {
           "datasource": null,
+          "description": "How much async time job spent waiting in the job queue before being picked up. This number should be really low <100ms to ensure signatures are validated fast.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "graph": false,
+                  "legend": false,
+                  "tooltip": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 32
+          },
+          "id": 95,
+          "options": {
+            "graph": {},
+            "legend": {
+              "calcs": [],
+              "displayMode": "hidden",
+              "placement": "bottom"
+            },
+            "tooltipOptions": {
+              "mode": "multi"
+            }
+          },
+          "pluginVersion": "7.4.5",
+          "targets": [
+            {
+              "expr": "delta(lodestar_bls_thread_pool_queue_job_wait_time_seconds_sum[$__rate_interval])/delta(lodestar_bls_thread_pool_queue_job_wait_time_seconds_count[$__rate_interval])",
+              "interval": "",
+              "legendFormat": "pool",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "BLS thread pool - job wait time",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "description": "Total length of the job queue. Note: this queue is not bounded",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "graph": false,
+                  "legend": false,
+                  "tooltip": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 40
+          },
+          "id": 150,
+          "options": {
+            "graph": {},
+            "legend": {
+              "calcs": [],
+              "displayMode": "hidden",
+              "placement": "bottom"
+            },
+            "tooltipOptions": {
+              "mode": "multi"
+            }
+          },
+          "pluginVersion": "7.4.5",
+          "targets": [
+            {
+              "expr": "lodestar_bls_thread_pool_queue_length",
+              "interval": "",
+              "legendFormat": "pool",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "BLS thread pool - queue length",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "description": "What percentage of total signature sets were verified in batch, which is an optimization to reduce verification costs by x2. For a synced node this should be ~100%",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "graph": false,
+                  "legend": false,
+                  "tooltip": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percentunit"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 40
+          },
+          "id": 147,
+          "options": {
+            "graph": {},
+            "legend": {
+              "calcs": [],
+              "displayMode": "hidden",
+              "placement": "bottom"
+            },
+            "tooltipOptions": {
+              "mode": "multi"
+            }
+          },
+          "pluginVersion": "7.4.5",
+          "targets": [
+            {
+              "expr": "delta(lodestar_bls_thread_pool_batch_sigs_success_total[$__rate_interval])/delta(lodestar_bls_thread_pool_success_jobs_signature_sets_count[$__rate_interval])",
+              "interval": "",
+              "legendFormat": "pool",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "BLS thread pool - % of sigs verified in batch",
+          "type": "timeseries"
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": null,
+          "description": "How many signature set batches fail per second. On failure all signatures in the batch have to be verified twice, so this number should be very low to make the optimization worth it.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {},
+              "custom": {},
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "fill": 1,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 48
+          },
+          "hiddenSeries": false,
+          "id": 152,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "nullPointMode": "null",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "7.4.5",
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "delta(lodestar_bls_thread_pool_batch_retries[$__rate_interval])",
+              "interval": "",
+              "legendFormat": "pool",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeRegions": [],
+          "timeShift": null,
+          "title": "BLS thread pool - batch retries / sec",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "none",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": null,
+          "description": "How many individual signature sets are invalid vs (valid + invalid). We don't control this number since peers may send us invalid signatures. This number should be very low since we should ban bad peers. If it's too high the batch optimization may not be worth it.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {},
+              "custom": {},
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              },
+              "unit": "percentunit"
+            },
+            "overrides": []
+          },
+          "fill": 1,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 48
+          },
+          "hiddenSeries": false,
+          "id": 153,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "nullPointMode": "null",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "7.4.5",
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "delta(lodestar_bls_thread_pool_error_jobs_signature_sets_count[$__rate_interval])/(delta(lodestar_bls_thread_pool_success_jobs_signature_sets_count[$__rate_interval])+delta(lodestar_bls_thread_pool_error_jobs_signature_sets_count[$__rate_interval]))",
+              "interval": "",
+              "legendFormat": "pool",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeRegions": [],
+          "timeShift": null,
+          "title": "BLS thread pool - sig error rate",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "percentunit",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "datasource": null,
+          "description": "Async time from sending a message to the worker and the worker receiving it.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 23,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "graph": false,
+                  "legend": false,
+                  "tooltip": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 56
+          },
+          "id": 148,
+          "options": {
+            "graph": {},
+            "legend": {
+              "calcs": [],
+              "displayMode": "hidden",
+              "placement": "bottom"
+            },
+            "tooltipOptions": {
+              "mode": "multi"
+            }
+          },
+          "pluginVersion": "7.4.5",
+          "targets": [
+            {
+              "expr": "delta(lodestar_bls_thread_pool_latency_to_worker_sum[$__rate_interval])/delta(lodestar_bls_thread_pool_latency_to_worker_count[$__rate_interval])",
+              "interval": "",
+              "legendFormat": "pool",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "BLS worker pool - to worker latency",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "description": "Average sets per job. A set may contain +1 signatures. This number should be higher than 1 to reduce communication costs",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -3044,10 +3606,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 4,
+            "h": 6,
             "w": 12,
             "x": 12,
-            "y": 29
+            "y": 56
           },
           "id": 97,
           "options": {
@@ -3072,11 +3634,91 @@
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "BLS thread pool average job group size",
+          "title": "BLS worker pool - sets per job",
           "type": "timeseries"
         },
         {
           "datasource": null,
+          "description": "Async time sending a message from a worker to the main thread and it receiving it.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 23,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "graph": false,
+                  "legend": false,
+                  "tooltip": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 62
+          },
+          "id": 149,
+          "options": {
+            "graph": {},
+            "legend": {
+              "calcs": [],
+              "displayMode": "hidden",
+              "placement": "bottom"
+            },
+            "tooltipOptions": {
+              "mode": "multi"
+            }
+          },
+          "pluginVersion": "7.4.5",
+          "targets": [
+            {
+              "expr": "delta(lodestar_bls_thread_pool_latency_from_worker_sum[$__rate_interval])/delta(lodestar_bls_thread_pool_latency_from_worker_count[$__rate_interval])",
+              "interval": "",
+              "legendFormat": "pool",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "BLS worker pool - from worker latency",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "description": "Average signatures per set. This number is decided by the time of object submitted to the pool:\n- Sync blocks: 128\n- Aggregates: 3\n- Attestations: 1",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -3122,10 +3764,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 4,
+            "h": 6,
             "w": 12,
             "x": 12,
-            "y": 33
+            "y": 62
           },
           "id": 98,
           "maxDataPoints": null,
@@ -3143,7 +3785,7 @@
           "pluginVersion": "7.4.5",
           "targets": [
             {
-              "expr": "delta(lodestar_bls_thread_pool_success_jobs_signature_sets_count[$__rate_interval])/(delta(lodestar_bls_thread_pool_jobs_started_total[$__rate_interval])>0)",
+              "expr": "delta(lodestar_bls_thread_pool_sig_sets_started_total[$__rate_interval])/(delta(lodestar_bls_thread_pool_jobs_started_total[$__rate_interval])>0)",
               "interval": "",
               "legendFormat": "pool",
               "refId": "A"
@@ -3151,7 +3793,7 @@
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "BLS thread pool average signature sets per job",
+          "title": "BLS worker pool - sigs per set",
           "type": "timeseries"
         }
       ],
@@ -4184,6 +4826,7 @@
                 "fillOpacity": 0,
                 "gradientMode": "none",
                 "hideFrom": {
+                  "graph": false,
                   "legend": false,
                   "tooltip": false,
                   "viz": false
@@ -4196,13 +4839,8 @@
                 },
                 "showPoints": "auto",
                 "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
+                "stacking": {},
+                "thresholdsStyle": {}
               },
               "mappings": [],
               "thresholds": {
@@ -4226,7 +4864,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 33
+            "y": 24
           },
           "id": 130,
           "options": {
@@ -4236,6 +4874,9 @@
               "placement": "bottom"
             },
             "tooltip": {
+              "mode": "single"
+            },
+            "tooltipOptions": {
               "mode": "single"
             }
           },
@@ -4266,6 +4907,7 @@
                 "fillOpacity": 24,
                 "gradientMode": "hue",
                 "hideFrom": {
+                  "graph": false,
                   "legend": false,
                   "tooltip": false,
                   "viz": false
@@ -4281,13 +4923,8 @@
                 },
                 "showPoints": "never",
                 "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "normal"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
+                "stacking": {},
+                "thresholdsStyle": {}
               },
               "mappings": [],
               "thresholds": {
@@ -4322,7 +4959,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 33
+            "y": 24
           },
           "id": 138,
           "options": {
@@ -4332,6 +4969,9 @@
               "placement": "bottom"
             },
             "tooltip": {
+              "mode": "single"
+            },
+            "tooltipOptions": {
               "mode": "single"
             }
           },
@@ -4372,6 +5012,7 @@
                 "fillOpacity": 0,
                 "gradientMode": "none",
                 "hideFrom": {
+                  "graph": false,
                   "legend": false,
                   "tooltip": false,
                   "viz": false
@@ -4384,13 +5025,8 @@
                 },
                 "showPoints": "auto",
                 "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
+                "stacking": {},
+                "thresholdsStyle": {}
               },
               "mappings": [],
               "thresholds": {
@@ -4413,7 +5049,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 41
+            "y": 32
           },
           "id": 132,
           "options": {
@@ -4423,6 +5059,9 @@
               "placement": "bottom"
             },
             "tooltip": {
+              "mode": "single"
+            },
+            "tooltipOptions": {
               "mode": "single"
             }
           },
@@ -4453,6 +5092,7 @@
                 "fillOpacity": 0,
                 "gradientMode": "none",
                 "hideFrom": {
+                  "graph": false,
                   "legend": false,
                   "tooltip": false,
                   "viz": false
@@ -4465,13 +5105,8 @@
                 },
                 "showPoints": "auto",
                 "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
+                "stacking": {},
+                "thresholdsStyle": {}
               },
               "mappings": [],
               "thresholds": {
@@ -4494,7 +5129,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 41
+            "y": 32
           },
           "id": 140,
           "options": {
@@ -4504,6 +5139,9 @@
               "placement": "bottom"
             },
             "tooltip": {
+              "mode": "single"
+            },
+            "tooltipOptions": {
               "mode": "single"
             }
           },
@@ -4535,6 +5173,7 @@
                 "fillOpacity": 0,
                 "gradientMode": "none",
                 "hideFrom": {
+                  "graph": false,
                   "legend": false,
                   "tooltip": false,
                   "viz": false
@@ -4547,13 +5186,8 @@
                 },
                 "showPoints": "auto",
                 "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
+                "stacking": {},
+                "thresholdsStyle": {}
               },
               "mappings": [],
               "thresholds": {
@@ -4573,7 +5207,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 49
+            "y": 40
           },
           "id": 146,
           "options": {
@@ -4583,6 +5217,9 @@
               "placement": "bottom"
             },
             "tooltip": {
+              "mode": "single"
+            },
+            "tooltipOptions": {
               "mode": "single"
             }
           },
@@ -4606,6 +5243,7 @@
               "color": {
                 "mode": "thresholds"
               },
+              "custom": {},
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
@@ -4627,7 +5265,7 @@
             "h": 8,
             "w": 3,
             "x": 12,
-            "y": 49
+            "y": 40
           },
           "id": 144,
           "options": {
@@ -4643,7 +5281,7 @@
             "text": {},
             "textMode": "auto"
           },
-          "pluginVersion": "8.0.0",
+          "pluginVersion": "7.4.5",
           "targets": [
             {
               "exemplar": true,
@@ -4695,7 +5333,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 24
+            "y": 25
           },
           "hiddenSeries": false,
           "id": 77,
@@ -4796,7 +5434,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 24
+            "y": 25
           },
           "hiddenSeries": false,
           "id": 80,
@@ -4897,7 +5535,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 32
+            "y": 33
           },
           "hiddenSeries": false,
           "id": 79,
@@ -5025,7 +5663,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 32
+            "y": 33
           },
           "id": 78,
           "options": {
@@ -5077,7 +5715,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 40
+            "y": 41
           },
           "hiddenSeries": false,
           "id": 82,
@@ -5179,7 +5817,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 40
+            "y": 41
           },
           "hiddenSeries": false,
           "id": 88,
@@ -5295,7 +5933,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 25
+            "y": 50
           },
           "hiddenSeries": false,
           "id": 84,
@@ -5391,7 +6029,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 25
+            "y": 50
           },
           "hiddenSeries": false,
           "id": 87,
@@ -6040,7 +6678,7 @@
             "h": 7,
             "w": 10,
             "x": 0,
-            "y": 27
+            "y": 52
           },
           "id": 68,
           "options": {
@@ -6094,7 +6732,7 @@
             "h": 7,
             "w": 14,
             "x": 10,
-            "y": 27
+            "y": 52
           },
           "id": 70,
           "options": {
@@ -6963,5 +7601,5 @@
   "timezone": "",
   "title": "Lodestar",
   "uid": "lodestar",
-  "version": 29
+  "version": 11
 }
