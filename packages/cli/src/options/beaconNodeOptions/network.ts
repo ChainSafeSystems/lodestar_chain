@@ -9,6 +9,7 @@ export interface INetworkArgs {
   "network.targetPeers": number;
   "network.bootMultiaddrs": string[];
   "network.localMultiaddrs": string[];
+  "network.subscribeAllSubnets": boolean;
 }
 
 export function parseArgs(args: INetworkArgs): IBeaconNodeOptions["network"] {
@@ -24,6 +25,7 @@ export function parseArgs(args: INetworkArgs): IBeaconNodeOptions["network"] {
     targetPeers: args["network.targetPeers"],
     bootMultiaddrs: args["network.bootMultiaddrs"],
     localMultiaddrs: args["network.localMultiaddrs"],
+    subscribeAllSubnets: args["network.subscribeAllSubnets"],
   };
 }
 
@@ -75,6 +77,13 @@ export const options: ICliCommandOptions<INetworkArgs> = {
     type: "array",
     description: "Local listening addresses for req/resp and gossip",
     defaultDescription: JSON.stringify(defaultOptions.network.localMultiaddrs),
+    group: "network",
+  },
+
+  "network.subscribeAllSubnets": {
+    type: "boolean",
+    description: "Subscribe to all subnets regardless of validator count",
+    defaultDescription: String(defaultOptions.network.subscribeAllSubnets === true),
     group: "network",
   },
 };

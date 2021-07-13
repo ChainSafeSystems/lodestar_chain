@@ -8,7 +8,7 @@ import Multiaddr from "multiaddr";
 import {AbortSignal} from "@chainsafe/abort-controller";
 import {IBeaconConfig} from "@chainsafe/lodestar-config";
 import {ILogger} from "@chainsafe/lodestar-utils";
-import {ForkName} from "@chainsafe/lodestar-params";
+import {ATTESTATION_SUBNET_COUNT, ForkName, SYNC_COMMITTEE_SUBNET_COUNT} from "@chainsafe/lodestar-params";
 import {Discv5Discovery, ENR} from "@chainsafe/discv5";
 import {computeEpochAtSlot} from "@chainsafe/lodestar-beacon-state-transition";
 import {Epoch} from "@chainsafe/lodestar-types";
@@ -58,7 +58,7 @@ export class Network implements INetwork {
 
   private subscribedForks = new Set<ForkName>();
 
-  constructor(opts: INetworkOptions & IReqRespOptions, modules: INetworkModules) {
+  constructor(private readonly opts: INetworkOptions & IReqRespOptions, modules: INetworkModules) {
     const {config, libp2p, logger, metrics, chain, reqRespHandlers, gossipHandlers, signal} = modules;
     this.libp2p = libp2p;
     this.logger = logger;
@@ -99,8 +99,8 @@ export class Network implements INetwork {
       forkDigestContext: chain.forkDigestContext,
     });
 
-    this.attnetsService = new AttnetsService(config, chain, this.gossip, metadata, logger);
-    this.syncnetsService = new SyncnetsService(config, chain, this.gossip, metadata, logger);
+    this.attnetsService = new AttnetsService(config, chain, this.gossip, metadata, logger, opts);
+    this.syncnetsService = new SyncnetsService(config, chain, this.gossip, metadata, logger, opts);
 
     this.peerManager = new PeerManager(
       {
@@ -284,6 +284,15 @@ export class Network implements INetwork {
     if (fork === ForkName.altair) {
       this.gossip.subscribeTopic({type: GossipType.sync_committee_contribution_and_proof, fork});
     }
+
+    if (this.opts.subscribeAllSubnets) {
+      for (let subnet = 0; subnet < ATTESTATION_SUBNET_COUNT; subnet++) {
+        this.gossip.subscribeTopic({type: GossipType.beacon_attestation, fork, subnet});
+      }
+      for (let subnet = 0; subnet < SYNC_COMMITTEE_SUBNET_COUNT; subnet++) {
+        this.gossip.subscribeTopic({type: GossipType.sync_committee, fork, subnet});
+      }
+    }
   };
 
   private unsubscribeCoreTopicsAtFork = (fork: ForkName): void => {
@@ -297,6 +306,15 @@ export class Network implements INetwork {
     this.gossip.unsubscribeTopic({type: GossipType.attester_slashing, fork});
     if (fork === ForkName.altair) {
       this.gossip.unsubscribeTopic({type: GossipType.sync_committee_contribution_and_proof, fork});
+    }
+
+    if (this.opts.subscribeAllSubnets) {
+      for (let subnet = 0; subnet < ATTESTATION_SUBNET_COUNT; subnet++) {
+        this.gossip.unsubscribeTopic({type: GossipType.beacon_attestation, fork, subnet});
+      }
+      for (let subnet = 0; subnet < SYNC_COMMITTEE_SUBNET_COUNT; subnet++) {
+        this.gossip.unsubscribeTopic({type: GossipType.sync_committee, fork, subnet});
+      }
     }
   };
 }

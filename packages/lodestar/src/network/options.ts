@@ -5,6 +5,7 @@ export interface INetworkOptions extends PeerManagerOpts {
   localMultiaddrs: string[];
   bootMultiaddrs: string[];
   discv5?: IDiscv5DiscoveryInputOptions;
+  subscribeAllSubnets?: boolean;
 }
 
 export const defaultDiscv5Options: IDiscv5DiscoveryInputOptions = {

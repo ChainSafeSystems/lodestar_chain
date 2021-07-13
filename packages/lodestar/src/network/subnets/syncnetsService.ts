@@ -8,7 +8,7 @@ import {getActiveForks} from "../forks";
 import {Eth2Gossipsub, GossipType} from "../gossip";
 import {MetadataController} from "../metadata";
 import {SubnetMap} from "../peers/utils";
-import {CommitteeSubscription, ISubnetsService} from "./interface";
+import {CommitteeSubscription, ISubnetsService, SubnetsServiceOpts} from "./interface";
 
 const gossipType = GossipType.sync_committee;
 
@@ -31,7 +31,8 @@ export class SyncnetsService implements ISubnetsService {
     private readonly chain: IBeaconChain,
     private readonly gossip: Eth2Gossipsub,
     private readonly metadata: MetadataController,
-    private readonly logger: ILogger
+    private readonly logger: ILogger,
+    private readonly opts?: SubnetsServiceOpts
   ) {}
 
   start(): void {
@@ -82,7 +83,9 @@ export class SyncnetsService implements ISubnetsService {
     if (prevFork === ForkName.phase0) return;
     this.logger.info("Unsuscribing to random attnets from prev fork", {prevFork});
     for (let subnet = 0; subnet < SYNC_COMMITTEE_SUBNET_COUNT; subnet++) {
-      this.gossip.unsubscribeTopic({type: gossipType, fork: prevFork, subnet});
+      if (!this.opts?.subscribeAllSubnets) {
+        this.gossip.unsubscribeTopic({type: gossipType, fork: prevFork, subnet});
+      }
     }
   }
 
@@ -130,7 +133,9 @@ export class SyncnetsService implements ISubnetsService {
     for (const subnet of subnets) {
       // No need to check if active in subscriptionsCommittee since we only have a single SubnetMap
       for (const fork of forks) {
-        this.gossip.unsubscribeTopic({type: gossipType, fork, subnet});
+        if (!this.opts?.subscribeAllSubnets) {
+          this.gossip.unsubscribeTopic({type: gossipType, fork, subnet});
+        }
       }
     }
   }

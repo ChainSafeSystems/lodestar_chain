@@ -21,3 +21,7 @@ export interface ISubnetsService {
 export interface IAttnetsService extends ISubnetsService {
   shouldProcess(subnet: number, slot: Slot): boolean;
 }
+
+export type SubnetsServiceOpts = {
+  subscribeAllSubnets?: boolean;
+};

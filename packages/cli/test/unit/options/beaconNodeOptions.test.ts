@@ -36,6 +36,7 @@ describe("options / beaconNodeOptions", () => {
       "network.targetPeers": 25,
       "network.bootMultiaddrs": [],
       "network.localMultiaddrs": [],
+      "network.subscribeAllSubnets": true,
 
       "sync.isSingleNode": true,
       "sync.disableProcessAsChainSegment": true,
@@ -82,6 +83,7 @@ describe("options / beaconNodeOptions", () => {
         targetPeers: 25,
         bootMultiaddrs: [],
         localMultiaddrs: [],
+        subscribeAllSubnets: true,
       },
       sync: {
         isSingleNode: true,
