@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
+import {IChainForkConfig} from "@chainsafe/lodestar-config";
+import {intDiv} from "@chainsafe/lodestar-utils";
+
 /**
  * For more info on some of these constants:
  * https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#configuration
@@ -38,9 +41,14 @@ export type RpcResponseStatusError = Exclude<RespStatus, RespStatus.SUCCESS>;
 
 /** The maximum allowed size of uncompressed gossip messages. */
 export const GOSSIP_MAX_SIZE = 2 ** 20;
+
+// source: https://github.com/ethereum/eth2.0-specs/blob/f52f067b8ea3f8adbebc936207b06459d1956e72/specs/phase0/p2p-interface.md#why-are-blocksbyrange-requests-only-required-to-be-served-for-the-latest-min_epochs_for_block_requests-epochs
+export function getMinEpochForBlockRequests(config: IChainForkConfig): number {
+  return config.MIN_VALIDATOR_WITHDRAWABILITY_DELAY + intDiv(config.CHURN_LIMIT_QUOTIENT, 2);
+}
+
 /** The maximum allowed size of uncompressed req/resp chunked responses. */
 export const MAX_CHUNK_SIZE = 2 ** 20;
-
 /** The maximum time to wait for first byte of request response (time-to-first-byte). */
 export const TTFB_TIMEOUT = 5 * 1000; // 5 sec
 /** The maximum time for complete response transfer. */

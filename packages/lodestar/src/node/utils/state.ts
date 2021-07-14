@@ -6,6 +6,7 @@ import {mkdirSync, writeFileSync} from "fs";
 import {dirname} from "path";
 import {IBeaconDb} from "../../db";
 import {TreeBacked} from "@chainsafe/ssz";
+import {GENESIS_SLOT} from "../../constants";
 
 export async function initDevState(
   config: IChainForkConfig,
@@ -21,6 +22,9 @@ export async function initDevState(
     genesisTime || Math.floor(Date.now() / 1000),
     deposits
   );
+  const block = config.getForkTypes(GENESIS_SLOT).SignedBeaconBlock.defaultValue();
+  block.message.stateRoot = config.getForkTypes(state.slot).BeaconState.hashTreeRoot(state);
+  await db.blockArchive.add(block);
   return state;
 }
 
