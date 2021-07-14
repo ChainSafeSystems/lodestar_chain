@@ -54,6 +54,7 @@ export async function validateGossipBlock(
   });
 
   const signatureSet = allForks.getProposerSignatureSet(blockState, block);
+  // Don't batch so verification is not delayed
   if (!(await chain.bls.verifySignatureSets([signatureSet]))) {
     throw new BlockGossipError(GossipAction.REJECT, {code: BlockErrorCode.PROPOSAL_SIGNATURE_INVALID});
   }

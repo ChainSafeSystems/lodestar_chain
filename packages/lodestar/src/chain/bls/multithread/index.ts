@@ -10,8 +10,8 @@ import {bls, Implementation, PointFormat} from "@chainsafe/bls";
 import {ILogger} from "@chainsafe/lodestar-utils";
 import {QueueError, QueueErrorCode} from "../../../util/queue";
 import {IMetrics} from "../../../metrics";
-import {IBlsVerifier} from "../interface";
-import {BlsWorkReq, WorkerData, WorkResult, WorkResultCode} from "./types";
+import {IBlsVerifier, VerifySignatureOpts} from "../interface";
+import {BlsWorkReq, BlsWorkResult, WorkerData, WorkResultCode} from "./types";
 import {chunkifyMaximizeChunkSize, getDefaultPoolSize} from "./utils";
 import {ISignatureSet} from "@chainsafe/lodestar-beacon-state-transition/src";
 import {getAggregatedPubkey} from "../utils";
@@ -24,6 +24,7 @@ export type BlsMultiThreadWorkerPoolModules = {
 
 /**
  * Split big signature sets into smaller sets so they can be sent to multiple workers.
+ *
  * The biggest sets happen during sync, on mainnet batches of 64 blocks have around ~8000 signatures.
  * The latency cost of sending the job to and from the worker is aprox a single sig verification.
  * If you split a big signature into 2, the extra time cost is `(2+2N)/(1+2N)`.
@@ -31,8 +32,26 @@ export type BlsMultiThreadWorkerPoolModules = {
  */
 const MAX_SIGNATURE_SETS_PER_JOB = 128;
 
+/**
+ * If there are more than `MAX_BUFFERED_SIGS` buffered sigs, verify them immediatelly without waiting `MAX_BUFFER_WAIT_MS`.
+ *
+ * The efficency improvement of batching sets asymptotically reaches x2. However, for batching large sets
+ * has more risk in case a signature is invalid, requiring to revalidate all sets in the batch. 32 is sweet
+ * point for this tradeoff.
+ */
+const MAX_BUFFERED_SIGS = 32;
+/**
+ * Gossip objects usually come in bursts. Buffering them for a short period of time allows to increase batching
+ * efficieny, at the cost of delaying validation. Unless running in production shows otherwise, it's not critical
+ * to hold attestations and aggregates for 100ms. Lodestar existing queues may hold those objects for much more anyway.
+ *
+ * There's no exact reasoning for the `100` miliseconds number. The metric `batchSigsSuccess` should indicate if this
+ * value needs revision
+ */
+const MAX_BUFFER_WAIT_MS = 100;
+
 type WorkerApi = {
-  doManyBlsWorkReq(workReqArr: BlsWorkReq[]): Promise<WorkResult<boolean>[]>;
+  verifyManySignatureSets(workReqArr: BlsWorkReq[]): Promise<BlsWorkResult>;
 };
 
 type JobQueueItem<R = boolean> = {
@@ -76,8 +95,14 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
   private readonly signal: AbortSignal;
 
   private readonly format: PointFormat;
-  private readonly jobs: JobQueueItem[] = [];
   private readonly workers: WorkerDescriptor[];
+  private readonly jobs: JobQueueItem[] = [];
+  private bufferedJobs: {
+    jobs: JobQueueItem[];
+    sigCount: number;
+    firstPush: number;
+    timeout: NodeJS.Timeout;
+  } | null = null;
 
   constructor(modules: BlsMultiThreadWorkerPoolModules) {
     const {logger, metrics, signal} = modules;
@@ -94,19 +119,28 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
     this.format = implementation === "blst-native" ? PointFormat.uncompressed : PointFormat.compressed;
     this.workers = this.createWorkers(implementation, getDefaultPoolSize());
 
-    this.signal.addEventListener("abort", this.abortAllJobs, {once: true});
-    this.signal.addEventListener("abort", this.terminateAllWorkers, {once: true});
+    this.signal.addEventListener(
+      "abort",
+      () => {
+        this.abortAllJobs();
+        this.terminateAllWorkers();
+        if (this.bufferedJobs) clearTimeout(this.bufferedJobs.timeout);
+      },
+      {once: true}
+    );
 
     if (metrics) {
-      metrics.blsThreadPoolQueueLength.addCollect(() => metrics.blsThreadPoolQueueLength.set(this.jobs.length));
+      metrics.blsThreadPool.queueLength.addCollect(() => metrics.blsThreadPool.queueLength.set(this.jobs.length));
     }
   }
 
-  async verifySignatureSets(sets: ISignatureSet[], validateSignature = true): Promise<boolean> {
+  async verifySignatureSets(sets: ISignatureSet[], opts: VerifySignatureOpts = {}): Promise<boolean> {
+    // Split large array of sets into smaller.
+    // Very helpful when syncing finalized, sync may submit +1000 sets so chunkify allows to distribute to many workers
     const results = await Promise.all(
       chunkifyMaximizeChunkSize(sets, MAX_SIGNATURE_SETS_PER_JOB).map((setsWorker) =>
         this.queueBlsWork({
-          validateSignature,
+          opts,
           sets: setsWorker.map((s) => ({
             publicKey: getAggregatedPubkey(s).toBytes(this.format),
             message: s.signingRoot.valueOf() as Uint8Array,
@@ -181,9 +215,34 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
     }
 
     return await new Promise<boolean>((resolve, reject) => {
-      const addedTimeMs = Date.now();
-      this.jobs.push({resolve, reject, addedTimeMs, workReq});
-      setTimeout(this.runJob, 0);
+      const job = {resolve, reject, addedTimeMs: Date.now(), workReq};
+
+      // Append batchable sets to `bufferedJobs`, starting a timeout to push them into `jobs`.
+      // Do not call `runJob()`, it is called from `runBufferedJobs()`
+      if (workReq.opts.batchable) {
+        if (!this.bufferedJobs) {
+          this.bufferedJobs = {
+            jobs: [],
+            sigCount: 0,
+            firstPush: Date.now(),
+            timeout: setTimeout(this.runBufferedJobs, MAX_BUFFER_WAIT_MS),
+          };
+        }
+        this.bufferedJobs.jobs.push(job);
+        this.bufferedJobs.sigCount += job.workReq.sets.length;
+        if (this.bufferedJobs.sigCount > MAX_BUFFERED_SIGS) {
+          clearTimeout(this.bufferedJobs.timeout);
+          this.runBufferedJobs();
+        }
+      }
+
+      // Push job and schedule to call `runJob` in the next macro event loop cycle.
+      // This is usefull to allow batching job submited from a syncronous for loop,
+      // and to prevent large stacks since runJob may be called recursively.
+      else {
+        this.jobs.push(job);
+        setTimeout(this.runJob, 0);
+      }
     });
   }
 
@@ -207,10 +266,6 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
       return;
     }
 
-    for (const job of jobs) {
-      this.metrics?.blsThreadPoolJobWaitTime.observe((Date.now() - job.addedTimeMs) / 1000);
-    }
-
     // TODO: After sending the work to the worker the main thread can drop the job arguments
     // and free-up memory, only needs to keep the job's Promise handlers.
     // Maybe it's not useful since all data referenced in jobs is likely referenced by others
@@ -218,29 +273,59 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
     const workerApi = worker.status.workerApi;
     worker.status = {code: WorkerStatusCode.running, workerApi};
 
-    this.metrics?.blsThreadPoolTotalJobsGroupsStarted.inc(1);
-    this.metrics?.blsThreadPoolTotalJobsStarted.inc(jobs.length);
-
-    // Send work package to the worker
-    // If the job, metrics or any code below throws: the job will reject never going stale.
-    // Only downside is the the job promise may be resolved twice, but that's not an issue
     try {
-      const result = await workerApi.doManyBlsWorkReq(jobs.map((job) => job.workReq));
+      let startedSigSets = 0;
+      for (const job of jobs) {
+        this.metrics?.blsThreadPool.jobWaitTime.observe((Date.now() - job.addedTimeMs) / 1000);
+        startedSigSets += job.workReq.sets.length;
+      }
+
+      this.metrics?.blsThreadPool.totalJobsGroupsStarted.inc(1);
+      if (jobs.length > 0) this.metrics?.blsThreadPool.totalJobsStarted.inc(jobs.length);
+      if (startedSigSets > 0) this.metrics?.blsThreadPool.totalSigSetsStarted.inc(startedSigSets);
+
+      // Send work package to the worker
+      // If the job, metrics or any code below throws: the job will reject never going stale.
+      // Only downside is the the job promise may be resolved twice, but that's not an issue
+
+      const jobStartNs = process.hrtime.bigint();
+      const workResult = await workerApi.verifyManySignatureSets(jobs.map((job) => job.workReq));
+      const jobEndNs = process.hrtime.bigint();
+      const {workerId, batchRetries, batchSigsSuccess, workerStartNs, workerEndNs, results} = workResult;
+
+      let successCount = 0;
+      let errorCount = 0;
 
       // Un-wrap work package
-      for (const [i, jobResult] of result.entries()) {
+      for (let i = 0; i < jobs.length; i++) {
         const job = jobs[i];
+        const jobResult = results[i];
         const sigSetCount = job.workReq.sets.length;
-        if (jobResult.code === WorkResultCode.success) {
+        if (!jobResult) {
+          job.reject(Error(`No jobResult for index ${i}`));
+          errorCount += sigSetCount;
+        } else if (jobResult.code === WorkResultCode.success) {
           job.resolve(jobResult.result);
-          const {workerId, workerJobTimeMs} = jobResult;
-          this.metrics?.blsThreadPoolSuccessJobsSignatureSetsCount.inc(sigSetCount);
-          this.metrics?.blsThreadPoolSuccessJobsWorkerTime.inc({workerId}, workerJobTimeMs / 1000);
+          successCount += sigSetCount;
         } else {
-          job.reject(Error(jobResult.error.message));
-          this.metrics?.blsThreadPoolErrorJobsSignatureSetsCount.inc(sigSetCount);
+          const workerError = Error(jobResult.error.message);
+          if (jobResult.error.stack) workerError.stack = jobResult.error.stack;
+          job.reject(workerError);
+          errorCount += sigSetCount;
         }
       }
+
+      const workerJobTimeSec = Number(workerEndNs - workerStartNs) / 1e9;
+      const latencyToWorkerSec = Number(workerStartNs - jobStartNs) / 1e9;
+      const latencyFromWorkerSec = Number(jobEndNs - workerEndNs) / 1e9;
+
+      if (workerJobTimeSec > 0) this.metrics?.blsThreadPool.jobsWorkerTime.inc({workerId}, workerJobTimeSec);
+      this.metrics?.blsThreadPool.latencyToWorker.observe(latencyToWorkerSec);
+      this.metrics?.blsThreadPool.latencyFromWorker.observe(latencyFromWorkerSec);
+      if (successCount > 0) this.metrics?.blsThreadPool.successJobsSignatureSetsCount.inc(successCount);
+      if (errorCount > 0) this.metrics?.blsThreadPool.errorJobsSignatureSetsCount.inc(errorCount);
+      if (batchRetries > 0) this.metrics?.blsThreadPool.batchRetries.inc(batchRetries);
+      if (batchSigsSuccess > 0) this.metrics?.blsThreadPool.batchSigsSuccess.inc(batchSigsSuccess);
     } catch (e) {
       // Worker communications should never reject
       if (!this.signal.aborted) this.logger.error("BlsMultiThreadWorkerPool error", {}, e);
@@ -277,12 +362,25 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
   }
 
   /**
+   * Add all buffered jobs to the job queue and potentially run them immediatelly
+   */
+  private runBufferedJobs = (): void => {
+    if (this.bufferedJobs) {
+      this.jobs.push(...this.bufferedJobs.jobs);
+      this.bufferedJobs = null;
+      setTimeout(this.runJob, 0);
+    }
+  };
+
+  /**
    * Stop all JavaScript execution in the worker thread immediatelly
    */
   private terminateAllWorkers = (): void => {
     for (const [id, worker] of this.workers.entries()) {
-      worker.worker.terminate((error, exitCode = 0) => {
-        if (error) this.logger.error("Error terminating worker", {id, exitCode}, error);
+      // NOTE: 'threads' has not yet updated types, and NodeJS complains with
+      // [DEP0132] DeprecationWarning: Passing a callback to worker.terminate() is deprecated. It returns a Promise instead.
+      ((worker.worker.terminate() as unknown) as Promise<void>).catch((e) => {
+        if (e) this.logger.error("Error terminating worker", {id}, e);
       });
     }
   };
@@ -293,4 +391,15 @@ export class BlsMultiThreadWorkerPool implements IBlsVerifier {
       if (job) job.reject(new QueueError({code: QueueErrorCode.QUEUE_ABORTED}));
     }
   };
+
+  /** For testing */
+  private async waitTillInitialized(): Promise<void> {
+    await Promise.all(
+      this.workers.map(async (worker) => {
+        if (worker.status.code === WorkerStatusCode.initializing) {
+          await worker.status.initPromise;
+        }
+      })
+    );
+  }
 }

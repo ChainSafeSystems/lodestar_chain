@@ -27,7 +27,7 @@ export async function validateGossipProposerSlashing(
   }
 
   const signatureSets = allForks.getProposerSlashingSignatureSets(state, proposerSlashing);
-  if (!(await chain.bls.verifySignatureSets(signatureSets))) {
+  if (!(await chain.bls.verifySignatureSets(signatureSets, {batchable: true}))) {
     throw new ProposerSlashingError(GossipAction.REJECT, {
       code: ProposerSlashingErrorCode.INVALID,
       error: Error("Invalid signature"),

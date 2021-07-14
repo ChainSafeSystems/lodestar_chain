@@ -1,5 +1,16 @@
 import {ISignatureSet} from "@chainsafe/lodestar-beacon-state-transition/src";
 
+export type VerifySignatureOpts = {
+  /**
+   * A batchable set MAY be verified with more sets to reduce the verification costs.
+   * Multiple sets may be merged and verified as one set. If the result is correct, success is returned
+   * for all them. If at least one set is invalid, all sets are reverified individually. For normal network
+   * conditions this strategy can yield 50% improvement in CPU time spent verifying gossip objects.
+   * Only non-time critical objects should be marked as batchable, since the pool may hold them for 100ms.
+   */
+  batchable?: boolean;
+};
+
 export interface IBlsVerifier {
   /**
    * Verify 1 or more signature sets. Sets may be verified on batch or not depending on their count
@@ -21,8 +32,6 @@ export interface IBlsVerifier {
    * Public keys have already been checked for subgroup and infinity
    * Signatures have already been checked for subgroup
    * Signature checks above could be done here for convienence as well
-   *
-   * @param validateSignature defaults to true
    */
-  verifySignatureSets(sets: ISignatureSet[], validateSignature?: boolean): Promise<boolean>;
+  verifySignatureSets(sets: ISignatureSet[], opts?: VerifySignatureOpts): Promise<boolean>;
 }

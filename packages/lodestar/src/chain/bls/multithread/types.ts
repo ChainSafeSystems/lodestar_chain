@@ -1,41 +1,38 @@
+import {VerifySignatureOpts} from "../interface";
+
 export type WorkerData = {
   implementation: "herumi" | "blst-native";
   workerId: number;
 };
 
-export type BlsWorkReq = {
-  validateSignature: boolean;
-  sets: {publicKey: Uint8Array; message: Uint8Array; signature: Uint8Array}[];
+export type SerializedSet = {
+  publicKey: Uint8Array;
+  message: Uint8Array;
+  signature: Uint8Array;
 };
 
-export type BlsWorkResult = WorkResult<boolean>;
+export type BlsWorkReq = {
+  opts: VerifySignatureOpts;
+  sets: SerializedSet[];
+};
 
 export enum WorkResultCode {
   success = "success",
   error = "error",
 }
 
-export type WorkResult<R> =
-  | {code: WorkResultCode.success; result: R; workerJobTimeMs: number; workerId: number}
-  | {code: WorkResultCode.error; error: Error};
+export type WorkResult<R> = {code: WorkResultCode.success; result: R} | {code: WorkResultCode.error; error: Error};
 
-export enum WorkerMessageCode {
-  workRequest = "workRequest",
-  workAcknowledge = "workAcknowledge",
-  workResult = "blsWorkResult",
-  ready = "ready",
-}
-
-export type WorkerMessage =
-  | {code: WorkerMessageCode.workRequest; taskId: number; requests: BlsWorkReq[]}
-  | {code: WorkerMessageCode.workAcknowledge; taskId: number}
-  | {code: WorkerMessageCode.workResult; taskId: number; results: WorkResult<unknown>[]}
-  | {code: WorkerMessageCode.ready};
-
-// export type WorkerApi = {
-//   verify(impl: Implementation, publicKey: Uint8Array, message: Uint8Array, signature: Uint8Array): Promise<boolean>;
-//   verifyMultipleAggregateSignatures(
-//     impl: Implementation,
-//     sets: {publicKey: Uint8Array; message: Uint8Array; signature: Uint8Array}[]
-//   ): Promise<boolean>;
-// };
+export type BlsWorkResult = {
+  /** Ascending integer identifying the worker for metrics */
+  workerId: number;
+  /** Total num of batches that had to be retried */
+  batchRetries: number;
+  /** Total num of sigs that have been successfully verified with batching */
+  batchSigsSuccess: number;
+  /** Time worker function starts - UNIX timestamp in nanoseconds */
+  workerStartNs: bigint;
+  /** Time worker function ends - UNIX timestamp in nanoseconds */
+  workerEndNs: bigint;
+  results: WorkResult<boolean>[];
+};
