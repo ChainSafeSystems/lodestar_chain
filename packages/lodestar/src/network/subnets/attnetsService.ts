@@ -15,7 +15,7 @@ import {Eth2Gossipsub, GossipType} from "../gossip";
 import {MetadataController} from "../metadata";
 import {SubnetMap, RequestedSubnet} from "../peers/utils";
 import {getActiveForks} from "../forks";
-import {IAttnetsService, CommitteeSubscription} from "./interface";
+import {IAttnetsService, CommitteeSubscription, SubnetsServiceOpts} from "./interface";
 
 /**
  * The time (in slots) before a last seen validator is considered absent and we unsubscribe from the random
@@ -52,7 +52,8 @@ export class AttnetsService implements IAttnetsService {
     private readonly chain: IBeaconChain,
     private readonly gossip: Eth2Gossipsub,
     private readonly metadata: MetadataController,
-    private readonly logger: ILogger
+    private readonly logger: ILogger,
+    private readonly opts?: SubnetsServiceOpts
   ) {}
 
   start(): void {
@@ -126,7 +127,9 @@ export class AttnetsService implements IAttnetsService {
   unsubscribeSubnetsFromPrevFork(prevFork: ForkName): void {
     this.logger.info("Unsuscribing to random attnets from prev fork", {prevFork});
     for (let subnet = 0; subnet < ATTESTATION_SUBNET_COUNT; subnet++) {
-      this.gossip.unsubscribeTopic({type: gossipType, fork: prevFork, subnet});
+      if (!this.opts?.subscribeAllSubnets) {
+        this.gossip.unsubscribeTopic({type: gossipType, fork: prevFork, subnet});
+      }
     }
   }
 
@@ -271,6 +274,8 @@ export class AttnetsService implements IAttnetsService {
 
   /** Trigger a gossip un-subscrition only if no-one is still subscribed */
   private unsubscribeSubnets(subnets: number[], slot: Slot): void {
+    if (this.opts?.subscribeAllSubnets) return;
+
     const forks = getActiveForks(this.config, this.chain.clock.currentEpoch);
     for (const subnet of subnets) {
       if (
@@ -278,7 +283,9 @@ export class AttnetsService implements IAttnetsService {
         !this.subscriptionsRandom.isActiveAtSlot(subnet, slot)
       ) {
         for (const fork of forks) {
-          this.gossip.unsubscribeTopic({type: gossipType, fork, subnet});
+          if (!this.opts?.subscribeAllSubnets) {
+            this.gossip.unsubscribeTopic({type: gossipType, fork, subnet});
+          }
         }
       }
     }
