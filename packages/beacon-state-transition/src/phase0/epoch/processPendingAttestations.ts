@@ -16,6 +16,7 @@ export function statusProcessEpoch<T extends allForks.BeaconState>(
   const rootType = ssz.Root;
   const prevEpoch = epochCtx.previousShuffling.epoch;
   const actualTargetBlockRoot = getBlockRootAtSlot(state, computeStartSlotAtEpoch(epoch));
+  const blockRoots = new Map<phase0.Slot, phase0.Root>();
   for (const att of readonlyValues(attestations)) {
     const aggregationBits = att.aggregationBits;
     const attData = att.data;
@@ -26,7 +27,12 @@ export function statusProcessEpoch<T extends allForks.BeaconState>(
     const attBeaconBlockRoot = attData.beaconBlockRoot;
     const attTarget = attData.target;
     const attVotedTargetRoot = rootType.equals(attTarget.root, actualTargetBlockRoot);
-    const attVotedHeadRoot = rootType.equals(attBeaconBlockRoot, getBlockRootAtSlot(state, attSlot));
+    let actualHeadRoot = blockRoots.get(attSlot);
+    if (!actualHeadRoot) {
+      actualHeadRoot = getBlockRootAtSlot(state, attSlot);
+      blockRoots.set(attSlot, actualHeadRoot);
+    }
+    const attVotedHeadRoot = rootType.equals(attBeaconBlockRoot, actualHeadRoot);
     const committee = epochCtx.getBeaconCommittee(attSlot, committeeIndex);
     const participants = zipIndexesCommitteeBits(committee, aggregationBits);
 

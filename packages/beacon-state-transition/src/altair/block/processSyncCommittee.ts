@@ -11,12 +11,15 @@ import {
   verifySignatureSet,
   zipAllIndexesSyncCommitteeBits,
   zipIndexesSyncCommitteeBits,
+  BlockProcess,
+  getEmptyBlockProcess,
 } from "../../util";
 import {CachedBeaconState} from "../../allForks/util";
 
 export function processSyncAggregate(
   state: CachedBeaconState<altair.BeaconState>,
   block: altair.BeaconBlock,
+  blockProcess: BlockProcess = getEmptyBlockProcess(),
   verifySignatures = true
 ): void {
   const {syncParticipantReward, syncProposerReward} = state.epochCtx;
@@ -33,10 +36,24 @@ export function processSyncAggregate(
   }
 
   const proposerIndex = state.epochCtx.getBeaconProposer(state.slot);
+  // TODO: it's not efficient to update 1024 balances in the balances tree
+  // consider if it's worth to implement asTransient(), asPersistent() for persistent-merkle-tree like in persistent-ts
   for (const participantIndex of participantIndices) {
     increaseBalance(state, participantIndex, syncParticipantReward);
   }
-  increaseBalance(state, proposerIndex, syncProposerReward * BigInt(participantIndices.length));
+  const proposerReward = syncProposerReward * BigInt(participantIndices.length);
+  // we increase proposer reward multiple times per block process, it's better to do that in batch
+  if (blockProcess.increaseBalanceCache) {
+    let increaseBalanceValue = blockProcess.increaseBalanceCache.get(proposerIndex);
+    if (increaseBalanceValue === undefined) {
+      increaseBalanceValue = BigInt(0);
+    }
+    increaseBalanceValue += proposerReward;
+    blockProcess.increaseBalanceCache.set(proposerIndex, increaseBalanceValue);
+  } else {
+    // for spec test only
+    increaseBalance(state, proposerIndex, proposerReward);
+  }
   for (const unparticipantIndex of unparticipantIndices) {
     decreaseBalance(state, unparticipantIndex, syncParticipantReward);
   }

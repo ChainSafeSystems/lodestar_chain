@@ -2,12 +2,12 @@ import {allForks, phase0} from "@chainsafe/lodestar-types";
 import {ForkName} from "@chainsafe/lodestar-params";
 import {CachedBeaconState} from "../../allForks/util";
 import {processProposerSlashing as processProposerSlashingAllForks} from "../../allForks/block";
-import {BlockProcess} from "../../util/blockProcess";
+import {BlockProcess, getEmptyBlockProcess} from "../../util/blockProcess";
 
 export function processProposerSlashing(
   state: CachedBeaconState<phase0.BeaconState>,
   proposerSlashing: phase0.ProposerSlashing,
-  blockProcess: BlockProcess = {validatorExitCache: {}},
+  blockProcess: BlockProcess = getEmptyBlockProcess(),
   verifySignatures = true
 ): void {
   processProposerSlashingAllForks(

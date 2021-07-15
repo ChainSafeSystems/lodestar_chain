@@ -8,7 +8,7 @@ import {processAttestation} from "./processAttestation";
 import {processDeposit} from "./processDeposit";
 import {processVoluntaryExit} from "./processVoluntaryExit";
 import {MAX_DEPOSITS} from "@chainsafe/lodestar-params";
-import {BlockProcess} from "../../util/blockProcess";
+import {BlockProcess, getEmptyBlockProcess} from "../../util/blockProcess";
 
 type Operation =
   | phase0.ProposerSlashing
@@ -26,7 +26,7 @@ type OperationFunction = (
 export function processOperations(
   state: CachedBeaconState<altair.BeaconState>,
   body: altair.BeaconBlockBody,
-  blockProcess: BlockProcess = {validatorExitCache: {}},
+  blockProcess: BlockProcess = getEmptyBlockProcess(),
   verifySignatures = true
 ): void {
   // verify that outstanding deposits are processed up to the maximum number of deposits

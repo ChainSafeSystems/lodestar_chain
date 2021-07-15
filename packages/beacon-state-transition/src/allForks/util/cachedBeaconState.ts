@@ -231,6 +231,7 @@ export class BeaconStateContext<T extends allForks.BeaconState> {
     this.balances.persistent.asTransient();
     this.previousEpochParticipation.persistent.asTransient();
     this.currentEpochParticipation.persistent.asTransient();
+    this.inactivityScores.persistent.asTransient();
   }
 
   /**
@@ -240,6 +241,8 @@ export class BeaconStateContext<T extends allForks.BeaconState> {
     this.validators.persistent.asPersistent();
     this.balances.persistent.asPersistent();
     this.previousEpochParticipation.persistent.asPersistent();
+    this.currentEpochParticipation.persistent.asPersistent();
+    this.inactivityScores.persistent.asPersistent();
   }
 }
 
