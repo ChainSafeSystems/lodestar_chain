@@ -144,7 +144,7 @@ function processSlotsWithTransientCache(
         metrics?.registerValidatorStatuses(process.currentEpoch, process.statuses);
 
         postState.slot++;
-        rotateEpochs(postState.epochCtx, postState, postState.validators);
+        rotateEpochs(postState.epochCtx, postState, process.indicesBounded);
       } finally {
         if (timer) timer();
       }

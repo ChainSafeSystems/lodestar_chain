@@ -54,6 +54,8 @@ export interface IEpochProcess {
   statuses: IAttesterStatus[];
   validators: phase0.Validator[];
   balances?: BigUint64Array;
+  // to be used for rotateEpochs()
+  indicesBounded: [ValidatorIndex, Epoch, Epoch][];
 }
 
 export function createIEpochProcess(): IEpochProcess {
@@ -77,6 +79,7 @@ export function createIEpochProcess(): IEpochProcess {
     churnLimit: 0,
     statuses: [],
     validators: [],
+    indicesBounded: [],
   };
 }
 
@@ -96,7 +99,8 @@ export function prepareEpochProcessState<T extends allForks.BeaconState>(state: 
 
   let activeCount = 0;
 
-  validators.forEach((v, i) => {
+  out.validators = validators.persistent.toArray();
+  out.validators.forEach((v, i) => {
     const status = createIAttesterStatus();
 
     if (v.slashed) {
@@ -118,8 +122,13 @@ export function prepareEpochProcessState<T extends allForks.BeaconState>(state: 
       activeCount += 1;
     }
 
-    if (v.exitEpoch !== FAR_FUTURE_EPOCH && v.exitEpoch > exitQueueEnd) {
-      exitQueueEnd = v.exitEpoch;
+    if (v.exitEpoch !== FAR_FUTURE_EPOCH) {
+      if (v.exitEpoch > exitQueueEnd) {
+        exitQueueEnd = v.exitEpoch;
+        exitQueueEndChurn = 1;
+      } else if (v.exitEpoch === exitQueueEnd) {
+        exitQueueEndChurn += 1;
+      }
     }
 
     if (v.activationEligibilityEpoch === FAR_FUTURE_EPOCH && v.effectiveBalance === MAX_EFFECTIVE_BALANCE) {
@@ -135,7 +144,7 @@ export function prepareEpochProcessState<T extends allForks.BeaconState>(state: 
     }
 
     out.statuses.push(status);
-    out.validators.push(v);
+    out.indicesBounded.push([i, v.activationEpoch, v.exitEpoch]);
   });
 
   if (out.totalActiveStake < EFFECTIVE_BALANCE_INCREMENT) {
@@ -149,12 +158,6 @@ export function prepareEpochProcessState<T extends allForks.BeaconState>(state: 
   out.indicesToMaybeActivate.sort(
     (a, b) => out.validators[a].activationEligibilityEpoch - out.validators[b].activationEligibilityEpoch || a - b
   );
-
-  for (const validator of out.validators) {
-    if (validator.exitEpoch === exitQueueEnd) {
-      exitQueueEndChurn += 1;
-    }
-  }
 
   const churnLimit = getChurnLimit(config, activeCount);
   if (exitQueueEndChurn >= churnLimit) {

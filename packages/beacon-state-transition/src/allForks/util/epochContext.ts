@@ -36,7 +36,6 @@ import {
 } from "../../util";
 import {computeEpochShuffling, IEpochShuffling} from "./epochShuffling";
 import {MutableVector} from "@chainsafe/persistent-ts";
-import {CachedValidatorList} from "./cachedValidatorList";
 import {computeBaseRewardPerIncrement} from "../../altair/misc";
 
 export type AttesterDuty = {
@@ -204,17 +203,12 @@ export function computeSyncParticipantReward(config: IBeaconConfig, totalActiveB
 export function rotateEpochs(
   epochCtx: EpochContext,
   state: allForks.BeaconState,
-  validators: CachedValidatorList<phase0.Validator>
+  indicesBounded: [ValidatorIndex, Epoch, Epoch][]
 ): void {
   epochCtx.previousShuffling = epochCtx.currentShuffling;
   epochCtx.currentShuffling = epochCtx.nextShuffling;
   const currEpoch = epochCtx.currentShuffling.epoch;
   const nextEpoch = currEpoch + 1;
-  const indicesBounded: [ValidatorIndex, Epoch, Epoch][] = validators.map((v, i) => [
-    i,
-    v.activationEpoch,
-    v.exitEpoch,
-  ]);
   epochCtx.nextShuffling = computeEpochShuffling(state, indicesBounded, nextEpoch);
   epochCtx.proposers = computeProposers(state, epochCtx.currentShuffling);
 
