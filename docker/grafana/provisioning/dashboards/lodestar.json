@@ -15,12 +15,16 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 3,
+  "id": 2,
   "links": [],
   "panels": [
     {
       "collapsed": false,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -49,7 +53,8 @@
             "hideFrom": {
               "graph": false,
               "legend": false,
-              "tooltip": false
+              "tooltip": false,
+              "viz": false
             },
             "lineInterpolation": "linear",
             "lineWidth": 1,
@@ -58,7 +63,14 @@
               "type": "linear"
             },
             "showPoints": "never",
-            "spanNulls": true
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
           "thresholds": {
@@ -167,12 +179,14 @@
                 "id": "mappings",
                 "value": [
                   {
-                    "from": "0",
-                    "id": 1,
-                    "text": "",
-                    "to": "1",
-                    "type": 2,
-                    "value": ""
+                    "options": {
+                      "from": 0,
+                      "result": {
+                        "text": ""
+                      },
+                      "to": 1
+                    },
+                    "type": "range"
                   }
                 ]
               }
@@ -194,7 +208,7 @@
           "displayMode": "list",
           "placement": "bottom"
         },
-        "tooltipOptions": {
+        "tooltip": {
           "mode": "multi"
         }
       },
@@ -232,7 +246,6 @@
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -266,7 +279,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "7.4.5",
+      "pluginVersion": "8.0.5",
       "targets": [
         {
           "expr": "sum(lodestar_peers_by_direction)",
@@ -285,7 +298,6 @@
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -319,7 +331,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "7.4.5",
+      "pluginVersion": "8.0.5",
       "targets": [
         {
           "expr": "beacon_head_slot",
@@ -337,7 +349,6 @@
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -371,7 +382,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "7.4.5",
+      "pluginVersion": "8.0.5",
       "targets": [
         {
           "expr": "beacon_finalized_epoch",
@@ -389,7 +400,6 @@
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -423,7 +433,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "7.4.5",
+      "pluginVersion": "8.0.5",
       "targets": [
         {
           "expr": "rate(beacon_head_slot[2m])",
@@ -441,8 +451,9 @@
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -476,7 +487,7 @@
         "text": {},
         "textMode": "value"
       },
-      "pluginVersion": "7.4.5",
+      "pluginVersion": "8.0.5",
       "targets": [
         {
           "expr": "rate(process_cpu_user_seconds_total[1m])",
@@ -494,7 +505,6 @@
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -529,7 +539,7 @@
         "text": {},
         "textMode": "value"
       },
-      "pluginVersion": "7.4.5",
+      "pluginVersion": "8.0.5",
       "targets": [
         {
           "expr": "process_heap_bytes",
@@ -547,7 +557,6 @@
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -586,7 +595,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "7.4.5",
+      "pluginVersion": "8.0.5",
       "targets": [
         {
           "expr": "process_start_time_seconds*1000",
@@ -605,39 +614,23 @@
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [
             {
-              "from": "",
-              "id": 1,
-              "text": "Stalled",
-              "to": "",
-              "type": 1,
-              "value": "0"
-            },
-            {
-              "from": "",
-              "id": 2,
-              "text": "SyncingFinalized",
-              "to": "",
-              "type": 1,
-              "value": "1"
-            },
-            {
-              "from": "",
-              "id": 3,
-              "text": "SyncingHead",
-              "to": "",
-              "type": 1,
-              "value": "2"
-            },
-            {
-              "from": "",
-              "id": 4,
-              "text": "Synced",
-              "to": "",
-              "type": 1,
-              "value": "3"
+              "options": {
+                "0": {
+                  "text": "Stalled"
+                },
+                "1": {
+                  "text": "SyncingFinalized"
+                },
+                "2": {
+                  "text": "SyncingHead"
+                },
+                "3": {
+                  "text": "Synced"
+                }
+              },
+              "type": "value"
             }
           ],
           "thresholds": {
@@ -673,7 +666,7 @@
         "text": {},
         "textMode": "value"
       },
-      "pluginVersion": "7.4.5",
+      "pluginVersion": "8.0.5",
       "targets": [
         {
           "expr": "lodestar_sync_status",
@@ -694,7 +687,6 @@
           "color": {
             "mode": "thresholds"
           },
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -732,7 +724,7 @@
         "text": {},
         "textMode": "name"
       },
-      "pluginVersion": "7.4.5",
+      "pluginVersion": "8.0.5",
       "targets": [
         {
           "expr": "lodestar_version",
@@ -754,7 +746,6 @@
             "fixedColor": "green",
             "mode": "fixed"
           },
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -785,7 +776,7 @@
         "text": {},
         "textMode": "name"
       },
-      "pluginVersion": "7.4.5",
+      "pluginVersion": "8.0.5",
       "targets": [
         {
           "expr": "lodestar_version",
@@ -809,7 +800,6 @@
           "color": {
             "mode": "thresholds"
           },
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -847,7 +837,7 @@
         "text": {},
         "textMode": "name"
       },
-      "pluginVersion": "7.4.5",
+      "pluginVersion": "8.0.5",
       "targets": [
         {
           "expr": "nodejs_version_info",
@@ -867,12 +857,6 @@
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "color": {},
-          "custom": {},
-          "thresholds": {
-            "mode": "absolute",
-            "steps": []
-          },
           "unit": "short"
         },
         "overrides": []
@@ -903,7 +887,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.4.5",
+      "pluginVersion": "8.0.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -978,7 +962,8 @@
             "hideFrom": {
               "graph": false,
               "legend": false,
-              "tooltip": false
+              "tooltip": false,
+              "viz": false
             },
             "lineInterpolation": "linear",
             "lineWidth": 1,
@@ -987,7 +972,14 @@
               "type": "linear"
             },
             "showPoints": "never",
-            "spanNulls": true
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
           "thresholds": {
@@ -1021,7 +1013,7 @@
           "displayMode": "hidden",
           "placement": "bottom"
         },
-        "tooltipOptions": {
+        "tooltip": {
           "mode": "multi"
         }
       },
@@ -1043,6 +1035,10 @@
     {
       "collapsed": true,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1068,7 +1064,8 @@
                 "hideFrom": {
                   "graph": false,
                   "legend": false,
-                  "tooltip": false
+                  "tooltip": false,
+                  "viz": false
                 },
                 "lineInterpolation": "linear",
                 "lineWidth": 1,
@@ -1077,7 +1074,14 @@
                   "type": "linear"
                 },
                 "showPoints": "never",
-                "spanNulls": true
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               },
               "mappings": [],
               "thresholds": {
@@ -1111,7 +1115,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -1149,7 +1153,8 @@
                 "hideFrom": {
                   "graph": false,
                   "legend": false,
-                  "tooltip": false
+                  "tooltip": false,
+                  "viz": false
                 },
                 "lineInterpolation": "linear",
                 "lineStyle": {
@@ -1161,41 +1166,33 @@
                   "type": "linear"
                 },
                 "showPoints": "never",
-                "spanNulls": false
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               },
               "decimals": 0,
               "mappings": [
                 {
-                  "from": "",
-                  "id": 1,
-                  "text": "Stalled",
-                  "to": "",
-                  "type": 1,
-                  "value": "0"
-                },
-                {
-                  "from": "",
-                  "id": 2,
-                  "text": "SyncingFinalized",
-                  "to": "",
-                  "type": 1,
-                  "value": "1"
-                },
-                {
-                  "from": "",
-                  "id": 3,
-                  "text": "SyncingHead",
-                  "to": "",
-                  "type": 1,
-                  "value": "2"
-                },
-                {
-                  "from": "",
-                  "id": 4,
-                  "text": "Synced",
-                  "to": "",
-                  "type": 1,
-                  "value": "3"
+                  "options": {
+                    "0": {
+                      "text": "Stalled"
+                    },
+                    "1": {
+                      "text": "SyncingFinalized"
+                    },
+                    "2": {
+                      "text": "SyncingHead"
+                    },
+                    "3": {
+                      "text": "Synced"
+                    }
+                  },
+                  "type": "value"
                 }
               ],
               "max": 3,
@@ -1223,7 +1220,7 @@
             "x": 12,
             "y": 17
           },
-          "id": 99,
+          "id": 172,
           "options": {
             "graph": {},
             "legend": {
@@ -1231,7 +1228,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -1251,6 +1248,124 @@
           "timeShift": null,
           "title": "Sync status",
           "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "slots",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "graph": false,
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 23
+          },
+          "id": 171,
+          "options": {
+            "graph": {},
+            "legend": {
+              "calcs": [],
+              "displayMode": "hidden",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "multi"
+            }
+          },
+          "pluginVersion": "7.4.5",
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "lodestar_clock_slot - beacon_head_slot",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "clock drift",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "head drift",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 12,
+            "y": 23
+          },
+          "id": 99,
+          "options": {
+            "content": "",
+            "mode": "markdown"
+          },
+          "pluginVersion": "8.0.5",
+          "targets": [
+            {
+              "exemplar": false,
+              "expr": "lodestar_sync_status",
+              "format": "time_series",
+              "instant": false,
+              "interval": "",
+              "legendFormat": "status",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "-",
+          "type": "text"
         }
       ],
       "title": "Node status",
@@ -1259,6 +1374,10 @@
     {
       "collapsed": true,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1327,7 +1446,7 @@
               "displayMode": "list",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -1405,7 +1524,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -1483,7 +1602,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -1657,7 +1776,7 @@
               "displayMode": "list",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -1735,7 +1854,7 @@
               "displayMode": "list",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -1813,7 +1932,7 @@
               "displayMode": "list",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -1907,7 +2026,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -1985,7 +2104,7 @@
               "displayMode": "list",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -2107,6 +2226,10 @@
     {
       "collapsed": true,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -2175,7 +2298,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -2225,20 +2348,15 @@
               "decimals": 0,
               "mappings": [
                 {
-                  "from": "",
-                  "id": 1,
-                  "text": "OK",
-                  "to": "",
-                  "type": 1,
-                  "value": "0"
-                },
-                {
-                  "from": "",
-                  "id": 2,
-                  "text": "DOWN",
-                  "to": "",
-                  "type": 1,
-                  "value": "1"
+                  "options": {
+                    "0": {
+                      "text": "OK"
+                    },
+                    "1": {
+                      "text": "DOWN"
+                    }
+                  },
+                  "type": "value"
                 }
               ],
               "max": 1,
@@ -2290,7 +2408,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -2315,6 +2433,10 @@
     {
       "collapsed": true,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -2374,7 +2496,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -2441,7 +2563,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -2508,7 +2630,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -2575,7 +2697,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -2642,7 +2764,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -2709,7 +2831,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -2732,6 +2854,10 @@
     {
       "collapsed": true,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -2901,7 +3027,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -2979,7 +3105,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -3057,7 +3183,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -3136,7 +3262,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -3161,6 +3287,10 @@
     {
       "collapsed": true,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -3331,7 +3461,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -3410,7 +3540,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -3489,7 +3619,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -3568,7 +3698,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -3647,7 +3777,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -3673,6 +3803,10 @@
     {
       "collapsed": true,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -3741,7 +3875,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -3819,7 +3953,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -3897,7 +4031,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -3975,7 +4109,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -4053,7 +4187,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -4131,7 +4265,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -4663,6 +4797,10 @@
     {
       "collapsed": true,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -5035,7 +5173,7 @@
               "displayMode": "list",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -5263,6 +5401,10 @@
     {
       "collapsed": true,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -5475,6 +5617,10 @@
     {
       "collapsed": true,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -5544,7 +5690,7 @@
               "displayMode": "list",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -5640,7 +5786,7 @@
               "displayMode": "list",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -5724,7 +5870,7 @@
               "displayMode": "list",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -5820,7 +5966,7 @@
               "displayMode": "list",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -5900,7 +6046,7 @@
               "displayMode": "hidden",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -5980,7 +6126,7 @@
               "displayMode": "list",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -6007,6 +6153,10 @@
     {
       "collapsed": true,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -6129,6 +6279,10 @@
     {
       "collapsed": true,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -6200,9 +6354,6 @@
               "placement": "bottom"
             },
             "tooltip": {
-              "mode": "single"
-            },
-            "tooltipOptions": {
               "mode": "single"
             }
           },
@@ -6280,9 +6431,6 @@
               "placement": "bottom"
             },
             "tooltip": {
-              "mode": "single"
-            },
-            "tooltipOptions": {
               "mode": "single"
             }
           },
@@ -6362,9 +6510,6 @@
             },
             "tooltip": {
               "mode": "single"
-            },
-            "tooltipOptions": {
-              "mode": "single"
             }
           },
           "targets": [
@@ -6443,9 +6588,6 @@
             },
             "tooltip": {
               "mode": "single"
-            },
-            "tooltipOptions": {
-              "mode": "single"
             }
           },
           "targets": [
@@ -6523,9 +6665,6 @@
             },
             "tooltip": {
               "mode": "single"
-            },
-            "tooltipOptions": {
-              "mode": "single"
             }
           },
           "targets": [
@@ -6547,6 +6686,10 @@
     {
       "collapsed": true,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -6616,7 +6759,7 @@
               "displayMode": "list",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -6693,7 +6836,7 @@
               "displayMode": "list",
               "placement": "bottom"
             },
-            "tooltipOptions": {
+            "tooltip": {
               "mode": "multi"
             }
           },
@@ -6716,6 +6859,10 @@
     {
       "collapsed": true,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -6947,7 +7094,7 @@
     }
   ],
   "refresh": "30s",
-  "schemaVersion": 27,
+  "schemaVersion": 30,
   "style": "dark",
   "tags": [],
   "templating": {
