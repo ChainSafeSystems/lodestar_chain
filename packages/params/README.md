@@ -29,11 +29,13 @@ The Lodestar params package contains several items used in all downstream Lodest
 
 Many downstream components are namespaced on fork names, or otherwise rely on knowing the fork names ahead of time. The Lodestar params package exports an enum `ForkName` the enumerates all known fork names.
 
-```ts
+```typescript
 import {ForkName} from "@chainsafe/lodestar-params";
 
-let f: ForkName;
-switch (f) {
+// dummy data
+let forkName = "phase0";
+
+switch (forkName) {
   case ForkName.phase0:
   case ForkName.altair:
   default:
@@ -44,7 +46,7 @@ switch (f) {
 
 All constants defined in the spec are exported verbatim.
 
-```ts
+```typescript
 import {GENESIS_SLOT} from "@chainsafe/lodestar-params";
 ```
 
@@ -54,7 +56,7 @@ Presets are "constants"-ish defined in the spec that can only be configured at b
 
 The active preset is exported under the `ACTIVE_PRESET` named export.
 
-```ts
+```typescript
 import {ACTIVE_PRESET, SLOTS_PER_EPOCH} from "@chainsafe/lodestar-params";
 ```
 

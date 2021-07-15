@@ -29,7 +29,8 @@
     "cli": "node --trace-deprecation --max-old-space-size=8192 ./packages/cli/bin/lodestar",
     "publish:release": "lerna publish from-package --yes --no-verify-access",
     "release": "lerna version --no-push --sign-git-commit",
-    "postrelease": "git tag -d $(git describe --abbrev=0)"
+    "postrelease": "git tag -d $(git describe --abbrev=0)",
+    "check-readme": "lerna run check-readme"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.8",
@@ -72,7 +73,7 @@
     "typedoc-plugin-internal-external": "^2.2.0",
     "typedoc-plugin-markdown": "^2.4.1",
     "typescript": "^4.2.0",
-    "webpack": "^5.36.2"
+    "typescript-docs-verifier": "^1.1.3"
   },
   "dependencies": {},
   "resolutions": {

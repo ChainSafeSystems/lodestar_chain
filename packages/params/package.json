@@ -31,7 +31,8 @@
     "lint:fix": "yarn run lint --fix",
     "test": "yarn run check-types",
     "test:unit": "mocha 'test/unit/**/*.test.ts'",
-    "test:e2e": "mocha 'test/e2e/**/*.test.ts'"
+    "test:e2e": "mocha 'test/e2e/**/*.test.ts'",
+    "check-readme": "typescript-docs-verifier"
   },
   "repository": {
     "type": "git",

@@ -33,7 +33,8 @@
     "lint": "eslint --color --ext .ts src/ test/",
     "lint:fix": "yarn run lint --fix",
     "pretest": "yarn run check-types",
-    "test:e2e": "mocha 'test/e2e/**/*.test.ts'"
+    "test:e2e": "mocha 'test/e2e/**/*.test.ts'",
+    "check-readme": "typescript-docs-verifier"
   },
   "repository": {
     "type": "git",

@@ -36,7 +36,8 @@
     "test:unit": "nyc --cache-dir .nyc_output/.cache -e .ts mocha 'test/unit/**/*.test.ts'",
     "test:e2e": "mocha --timeout 30000 'test/e2e/**/*.test.ts'",
     "test": "yarn test:unit && yarn test:e2e",
-    "coverage": "codecov -F lodestar"
+    "coverage": "codecov -F lodestar",
+    "check-readme": "typescript-docs-verifier"
   },
   "repository": {
     "type": "git",

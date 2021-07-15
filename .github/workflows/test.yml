@@ -37,3 +37,5 @@ jobs:
         run: yarn coverage
       - name: E2e tests
         run: yarn test:e2e
+      - name: README check
+        run: yarn run check-readme

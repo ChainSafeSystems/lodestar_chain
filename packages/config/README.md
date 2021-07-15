@@ -31,16 +31,17 @@ The Lodestar config package contains several interfaces used in downstream Lodes
 
 The Ethereum consensus spec defines a bunch of variables that may be easily configured per testnet. These include the `GENESIS_TIME`, `SECONDS_PER_SLOT`, and various `*_FORK_EPOCH`s, `*_FORK_VERSION`s, etc. The Lodestar config package exports the `IChainConfig` interface and matching `ChainConfig` SSZ type, which include all of these variables, named verbatim from the spec.
 
-```ts
+```typescript
 import {IChainConfig} from "@chainsafe/lodestar-config";
+import {chainConfig} from "@chainsafe/lodestar-config/default";
 
-let chainConfig: IChainConfig;
-const x: number = chainConfig.SECONDS_PER_SLOT;
+let config: IChainConfig = chainConfig;
+const x: number = config.SECONDS_PER_SLOT;
 ```
 
 Mainnet default values are available as a singleton `IChainConfig` under the `default` import path.
 
-```ts
+```typescript
 import {chainConfig} from "@chainsafe/lodestar-config/default";
 
 chainConfig.SECONDS_PER_SLOT === 12;
@@ -48,14 +49,36 @@ chainConfig.SECONDS_PER_SLOT === 12;
 
 There are also utility functions to help create a `IChainConfig` from unknown input and partial configs.
 
-```ts
+```typescript
 import {createIChainConfig, IChainConfig, parsePartialIChainConfigJson} from "@chainsafe/lodestar-config";
 
-const chainConfigObj: Record<string, unknown> = {
-  // Eg: read yaml file into an object
-};
+// example config
+let chainConfigObj: Record<string, unknown> = {
+  // phase0
+  MIN_PER_EPOCH_CHURN_LIMIT: 4,
+  CHURN_LIMIT_QUOTIENT: 65536,
+  MIN_GENESIS_ACTIVE_VALIDATOR_COUNT: 128,
+  MIN_GENESIS_TIME: 1621504614,
+  ETH1_FOLLOW_DISTANCE: 2048,
+  SECONDS_PER_ETH1_BLOCK: 14,
+  DEPOSIT_CHAIN_ID: 5,
+  DEPOSIT_NETWORK_ID: 5,
+  DEPOSIT_CONTRACT_ADDRESS: "0x2cc88381fe23027743c1f85512bffb383acca7c7",
+  EJECTION_BALANCE: 16000000000,
+  GENESIS_FORK_VERSION: "0x00004811",
+  GENESIS_DELAY: 1100642,
+  SECONDS_PER_SLOT: 12,
+  MIN_VALIDATOR_WITHDRAWABILITY_DELAY: 256,
+  SHARD_COMMITTEE_PERIOD: 256,
 
-const partialChainConfig: Partial<IChainConfig> = parsePartialIChainConfigJson(configObj);
+  // altair
+  INACTIVITY_SCORE_BIAS: 4,
+  INACTIVITY_SCORE_RECOVERY_RATE: 16,
+  ALTAIR_FORK_VERSION: "0x01004811",
+  ALTAIR_FORK_EPOCH: 10,
+}
+
+const partialChainConfig: Partial<IChainConfig> = parsePartialIChainConfigJson(chainConfigObj);
 
 // Fill in the missing values with mainnet default values
 const chainConfig: IChainConfig = createIChainConfig(partialChainConfig);
@@ -67,11 +90,10 @@ The variables described in the spec can be used to assemble a more structured 'f
 
 A `IForkConfig` provides methods to select the fork info, fork name, fork version, or fork ssz types given a slot. 
 
-```ts
+```typescript
 import {GENESIS_SLOT} from "@chainsafe/lodestar-params";
-import {createIChainForkConfig, IChainConfig, IChainForkConfig} from "@chainsafe/lodestar-config";
-
-let chainConfig: IChainConfig;
+import {createIChainForkConfig, IChainForkConfig} from "@chainsafe/lodestar-config";
+import {config as chainConfig} from "@chainsafe/lodestar-config/default";
 
 const config: IChainForkConfig = createIChainForkConfig(chainConfig);
 
@@ -82,12 +104,13 @@ const version = config.getForkVersion(GENESIS_SLOT);
 
 For signing Ethereum consensus objects, a cryptographic "domain" is computed and mixed into the signed message. This domain separates signatures made for the Ethereum mainnet from testnets or other instances of the chain. The `ICachedGenesis` interface is used to provide a cache for this purpose. Practically, the domain rarely changes, only per-fork, and so the value can be easily cached. Since the genesis validators root is part of the domain, it is required input to instantiate an `ICachedGenesis`. In practice, the `IChainForkConfig` and `ICachedGenesis` are usually combined as a `IBeaconConfig`. This is the 'highest level' object exported by the Lodestar config library.
 
-```ts
+```typescript
 import {DOMAIN_DEPOSIT, GENESIS_SLOT} from "@chainsafe/lodestar-params";
-import {createIBeaconConfig, IBeaconConfig, IChainConfig} from "@chainsafe/lodestar-config";
+import {createIBeaconConfig, IBeaconConfig} from "@chainsafe/lodestar-config";
+import {config as chainConfig} from "@chainsafe/lodestar-config/default";
 
-let chainConfig: Partial<IChainConfig>;
-let genesisValidatorsRoot: Uint8Array;
+// dummy test root
+let genesisValidatorsRoot: Uint8Array = new Uint8Array();
 
 const config: IBeaconConfig = createIBeaconConfig(chainConfig, genesisValidatorsRoot);
 

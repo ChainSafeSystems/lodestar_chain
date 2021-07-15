@@ -14,24 +14,24 @@ The beacon state transition and state transition utilities
 
 ```typescript
 
-import {stateTransition} from "@chainsafe/lodestar-beacon-state-transition";
-import {BeaconBlock, BeaconState} from "@chainsafe/lodestar-types";
-import {mainnetConfig} from "@chainsafe/lodestar-config/mainnet";
+import {CachedBeaconState, stateTransition} from "@chainsafe/lodestar-beacon-state-transition/src/allForks";
+import {allForks} from "@chainsafe/lodestar-types";
+import {generateEmptySignedBlock} from "../test/utils/block";
+import {generateState} from "../test/utils/state";
 
-const state: BeaconState = {
-  ...
-};
+// dummy test state
+const state: CachedBeaconState<allForks.BeaconState> = generateState() as CachedBeaconState<allForks.BeaconState>;
 
-const block: BeaconBlock = {
-  ...
-};
+// dummy test block 
+const block: allForks.SignedBeaconBlock = generateEmptySignedBlock();
 
-let postStateContext: BeaconState;
+let postStateContext: allForks.BeaconState;
 try {
-  postStateContext = stateTransition(mainnetConfig, state, block);
+  postStateContext = stateTransition(state, block);
 } catch (e) {
   console.log(e);
 }
+
 ```
 
 ## License

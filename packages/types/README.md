@@ -29,7 +29,7 @@ Lodestar types are all defined as typescript interfaces. These interfaces can be
 
 These interfaces are accessible via named exports.
 
-```ts
+```typescript
 import {Epoch} from "@chainsafe/lodestar-types";
 
 const x: Epoch = 5;
@@ -39,7 +39,7 @@ const x: Epoch = 5;
 
 Lodestar types are also defined as SSZ objects. These "Type" objects provide convenient methods to perform SSZ operations (serialization / deserialization / merkleization/etc). The library exports a singleton object containing all SSZ objects.
 
-```ts
+```typescript
 import {Type} from "@chainsafe/ssz";
 import {ssz, Epoch} from "@chainsafe/lodestar-types";
 
@@ -52,7 +52,7 @@ const e = EpochType.defaultValue();
 
 Lodestar types support multiple different consensus forks. In order to easily differentiate types that may change across forks, types are organized in namespaces according to the fork in which they're introduced. Types introduced in phase 0 are available under the `phase0` namespace. Types introduced in altair are available under the `altair` namespace.
 
-```ts
+```typescript
 import {altair, phase0, ssz} from "@chainsafe/lodestar-types";
 
 const phase0State: phase0.BeaconState = ssz.phase0.BeaconState.defaultValue();
@@ -61,7 +61,7 @@ const altairState: altair.BeaconState = ssz.altair.BeaconState.defaultValue();
 
 Primitive types are directly available without a namespace.
 
-```ts
+```typescript
 import {Epoch, ssz} from "@chainsafe/lodestar-types";
 
 const epoch: Epoch = ssz.Epoch.defaultValue();
@@ -69,7 +69,7 @@ const epoch: Epoch = ssz.Epoch.defaultValue();
 
 In some cases, we need interfaces that accept types across all forks, eg: when the fork is not known ahead of time. Typescript interfaces for this purpose are exported under the `allForks` namespace. SSZ Types typed to these interfaces are also provided under an `allForks` namespace, but keyed by `ForkName`.
 
-```ts
+```typescript
 import {ForkName} from "@chainsafe/lodestar-params";
 import {allForks, ssz} from "@chainsafe/lodestar-types";
 

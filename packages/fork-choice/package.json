@@ -35,7 +35,8 @@
     "lint:fix": "yarn run lint --fix",
     "pretest": "yarn run check-types",
     "test": "yarn test:unit",
-    "test:unit": "mocha --colors -r ts-node/register 'test/unit/**/*.test.ts'"
+    "test:unit": "mocha --colors -r ts-node/register 'test/unit/**/*.test.ts'",
+    "check-readme": "typescript-docs-verifier"
   },
   "dependencies": {
     "@chainsafe/lodestar-beacon-state-transition": "^0.26.0",

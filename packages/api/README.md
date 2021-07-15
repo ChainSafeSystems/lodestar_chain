@@ -13,18 +13,16 @@ Typescript REST client for the [Eth2.0 API spec](https://ethereum.github.io/eth2
 
 ```typescript
 import {getClient} from "@chainsafe/lodestar-api";
-import {config} from "@chainsafe/lodestar-config/mainnet";
+import {config} from "@chainsafe/lodestar-config/default";
 
 const api = getClient(config, {
   baseUrl: "http://localhost:9596",
 });
 
-const res = await api.state.getStateValidator(
+api.beacon.getStateValidator(
   "head",
   "0x933ad9491b62059dd065b560d256d8957a8c402cc6e8d8ee7290ae11e8f7329267a8811c397529dac52ae1342ba58c95"
-);
-
-console.log("Your balance is:", res.data.balance);
+).then((res) => console.log("Your balance is:", res.data.balance));
 ```
 
 ## Prerequisites

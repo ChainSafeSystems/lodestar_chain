@@ -32,7 +32,8 @@
     "check-types": "tsc",
     "lint": "eslint --color --ext .ts src/ test/",
     "lint:fix": "yarn run lint --fix",
-    "test:unit": "mocha 'test/**/*.test.ts'"
+    "test:unit": "mocha 'test/**/*.test.ts'",
+    "check-readme": "typescript-docs-verifier"
   },
   "types": "lib/index.d.ts",
   "dependencies": {
