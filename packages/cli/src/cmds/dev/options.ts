@@ -2,6 +2,7 @@ import {Options} from "yargs";
 import {ICliCommandOptions} from "../../util";
 import {beaconOptions, IBeaconArgs} from "../beacon/options";
 import {globalOptions, beaconNodeOptions} from "../../options";
+import {validatorOptions, IValidatorCliArgs} from "../validator/options";
 
 interface IDevOwnArgs {
   genesisValidators?: number;
@@ -87,8 +88,9 @@ const externalOptionsOverrides: {[k: string]: Options} = {
 
 export const devOptions = {
   ...beaconOptions,
+  ...validatorOptions,
   ...externalOptionsOverrides,
   ...devOwnOptions,
 };
 
-export type IDevArgs = IBeaconArgs & IDevOwnArgs;
+export type IDevArgs = IBeaconArgs & IValidatorCliArgs & IDevOwnArgs;

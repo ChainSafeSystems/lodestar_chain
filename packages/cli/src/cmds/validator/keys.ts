@@ -6,8 +6,12 @@ import {parseRange, YargsError} from "../../util";
 import {ValidatorDirManager} from "../../validatorDir";
 import {getAccountPaths} from "../account/paths";
 import {IValidatorCliArgs} from "./options";
+import {IAccountPathOptions} from "@chainsafe/lodestar-validator";
 
-export async function getSecretKeys(args: IValidatorCliArgs & IGlobalArgs): Promise<SecretKey[]> {
+export async function getSecretKeys(
+  args: IValidatorCliArgs & IGlobalArgs,
+  opts?: IAccountPathOptions
+): Promise<SecretKey[]> {
   // UNSAFE - ONLY USE FOR TESTNETS. Derive keys directly from a mnemonic
   if (args.fromMnemonic) {
     if (args.network === defaultNetwork) {
@@ -33,7 +37,7 @@ export async function getSecretKeys(args: IValidatorCliArgs & IGlobalArgs): Prom
 
   // Read keys from local account manager
   else {
-    const accountPaths = getAccountPaths(args);
+    const accountPaths = getAccountPaths(args, opts);
     const validatorDirManager = new ValidatorDirManager(accountPaths);
     return await validatorDirManager.decryptAllValidators({force: args.force});
   }

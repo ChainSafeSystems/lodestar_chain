@@ -5,7 +5,6 @@ export * from "./file";
 export * from "./format";
 export * from "./fs";
 export * from "./gitData";
-export * from "./graffiti";
 export * from "./logger";
 export * from "./object";
 export * from "./passphrase";

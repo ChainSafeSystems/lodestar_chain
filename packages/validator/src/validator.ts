@@ -16,8 +16,10 @@ import {SyncCommitteeService} from "./services/syncCommittee";
 import {ISlashingProtection} from "./slashingProtection";
 import {assertEqualParams, getLoggerVc} from "./util";
 import {ChainHeaderTracker} from "./services/chainHeaderTracker";
+import {IValidatorOptions} from "./options";
 
-export type ValidatorOptions = {
+export type IValidatorModules = {
+  opts?: IValidatorOptions;
   slashingProtection: ISlashingProtection;
   config: IChainForkConfig;
   api: Api | string;
@@ -41,6 +43,7 @@ type State = {status: Status.running; controller: AbortController} | {status: St
  * Main class for the Validator client.
  */
 export class Validator {
+  private readonly opts?: IValidatorOptions;
   private readonly config: IBeaconConfig;
   private readonly api: Api;
   private readonly secretKeys: SecretKey[];
@@ -49,7 +52,7 @@ export class Validator {
   private readonly logger: ILogger;
   private state: State = {status: Status.stopped};
 
-  constructor(opts: ValidatorOptions, genesis: Genesis) {
+  constructor(opts: IValidatorModules, genesis: Genesis) {
     const {config: chainForkConfig, logger, slashingProtection, secretKeys, graffiti} = opts;
     const config = createIBeaconConfig(chainForkConfig, genesis.genesisValidatorsRoot);
 
@@ -76,10 +79,11 @@ export class Validator {
     this.api = api;
     this.clock = clock;
     this.secretKeys = secretKeys;
+    this.opts = opts.opts;
   }
 
   /** Waits for genesis and genesis time */
-  static async initializeFromBeaconNode(opts: ValidatorOptions, signal?: AbortSignal): Promise<Validator> {
+  static async initializeFromBeaconNode(opts: IValidatorModules, signal?: AbortSignal): Promise<Validator> {
     const api =
       typeof opts.api === "string"
         ? getClient(opts.config, {baseUrl: opts.api, timeoutMs: 12000, getAbortSignal: () => signal})

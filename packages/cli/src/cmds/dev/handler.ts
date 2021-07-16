@@ -18,6 +18,8 @@ import {getValidatorPaths} from "../validator/paths";
 import {interopSecretKey} from "@chainsafe/lodestar-beacon-state-transition";
 import {SecretKey} from "@chainsafe/bls";
 import {createIBeaconConfig} from "@chainsafe/lodestar-config";
+import {ValidatorOptions} from "../../config/validatorOptions";
+import {IValidatorCliArgs, parseValidatorArgs} from "../validator/options";
 
 /**
  * Run a beacon node with validator
@@ -116,6 +118,9 @@ export async function devHandler(args: IDevArgs & IGlobalArgs): Promise<void> {
       secretKeys.push(interopSecretKey(i));
     }
 
+    const valOptions = new ValidatorOptions({validatorOptionsCli: parseValidatorArgs(args as IValidatorCliArgs)});
+    const opts = valOptions.getWithDefaults();
+
     const dbPath = path.join(validatorsDbDir, "validators");
     fs.mkdirSync(dbPath, {recursive: true});
 
@@ -130,6 +135,7 @@ export async function devHandler(args: IDevArgs & IGlobalArgs): Promise<void> {
 
     // Initailize genesis once for all validators
     const validator = await Validator.initializeFromBeaconNode({
+      opts,
       config,
       slashingProtection,
       api,

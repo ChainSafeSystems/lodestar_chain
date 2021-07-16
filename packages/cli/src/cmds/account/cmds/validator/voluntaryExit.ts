@@ -5,10 +5,11 @@ import {ValidatorDirManager} from "../../../../validatorDir";
 import {getAccountPaths} from "../../paths";
 import {getBeaconConfigFromArgs} from "../../../../config";
 import {errorLogger} from "../../../../util/logger";
-import {IValidatorCliArgs, validatorOptions} from "../../../validator/options";
+import {IValidatorCliArgs, validatorOptions, parseValidatorArgs} from "../../../validator/options";
 import inquirer from "inquirer";
 import {readdirSync} from "fs";
 import {getSlashingProtection} from "./slashingProtection/utils";
+import {ValidatorOptions} from "../../../../config/validatorOptions";
 
 /* eslint-disable no-console */
 
@@ -49,6 +50,9 @@ like to choose for the voluntary exit.",
 
   handler: async (args) => {
     await initBLS();
+
+    const valOptions = new ValidatorOptions({validatorOptionsCli: parseValidatorArgs(args)});
+    const opts = valOptions.getWithDefaults();
 
     const force = args.force;
     let publicKey = args.publicKey;
@@ -103,6 +107,7 @@ BE UNTIL AT LEAST TWO YEARS AFTER THE PHASE 0 MAINNET LAUNCH.
     const config = getBeaconConfigFromArgs(args);
 
     const validatorClient = await Validator.initializeFromBeaconNode({
+      opts,
       slashingProtection: getSlashingProtection(args),
       config,
       api: args.server,

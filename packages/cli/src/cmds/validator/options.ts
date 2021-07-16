@@ -1,12 +1,15 @@
 import {ICliCommandOptions, ILogArgs} from "../../util";
-import {defaultValidatorPaths} from "./paths";
+import {defaultValidatorPaths, IValidatorPaths} from "./paths";
 import {accountValidatorOptions, IAccountValidatorArgs} from "../account/cmds/validator/options";
 import {logOptions, beaconPathsOptions} from "../beacon/options";
 import {IBeaconPaths} from "../beacon/paths";
+import {IValidatorOptions} from "@chainsafe/lodestar-validator";
+import {RecursivePartial} from "@chainsafe/lodestar-utils";
+import {removeUndefinedRecursive} from "../../util";
 
 export type IValidatorCliArgs = IAccountValidatorArgs &
-  ILogArgs & {
-    validatorsDbDir?: string;
+  ILogArgs &
+  IValidatorPaths & {
     server: string;
     force: boolean;
     graffiti: string;
@@ -16,6 +19,14 @@ export type IValidatorCliArgs = IAccountValidatorArgs &
     logFile: IBeaconPaths["logFile"];
   };
 
+export function parseValidatorArgs(args: IValidatorCliArgs): RecursivePartial<IValidatorOptions> {
+  // Remove undefined values to allow deepmerge to inject default values downstream
+  return removeUndefinedRecursive({
+    graffiti: args.graffiti,
+    account: {keystoresDir: args.keystoresDir, secretsDir: args.secretsDir},
+  });
+}
+
 export const validatorOptions: ICliCommandOptions<IValidatorCliArgs> = {
   ...accountValidatorOptions,
   ...logOptions,
@@ -24,6 +35,12 @@ export const validatorOptions: ICliCommandOptions<IValidatorCliArgs> = {
   validatorsDbDir: {
     description: "Data directory for validator databases.",
     defaultDescription: defaultValidatorPaths.validatorsDbDir,
+    type: "string",
+  },
+
+  configFile: {
+    description: "Validator configuration file path",
+    defaultDescription: defaultValidatorPaths.configFile,
     type: "string",
   },
 

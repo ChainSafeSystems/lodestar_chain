@@ -1,7 +1,7 @@
 import tmp from "tmp";
 import {LevelDbController} from "@chainsafe/lodestar-db";
 import {interopSecretKey} from "@chainsafe/lodestar-beacon-state-transition";
-import {SlashingProtection, Validator} from "@chainsafe/lodestar-validator";
+import {SlashingProtection, Validator, IValidatorOptions} from "@chainsafe/lodestar-validator";
 import {BeaconNode} from "../../../src/node";
 import {testLogger, TestLoggerOpts} from "../logger";
 
@@ -12,6 +12,7 @@ export async function getAndInitDevValidators({
   startIndex = 0,
   useRestApi,
   testLoggerOpts,
+  validatorOpts,
 }: {
   node: BeaconNode;
   validatorsPerClient: number;
@@ -19,6 +20,7 @@ export async function getAndInitDevValidators({
   startIndex: number;
   useRestApi?: boolean;
   testLoggerOpts?: TestLoggerOpts;
+  validatorOpts?: IValidatorOptions;
 }): Promise<Validator[]> {
   const vcs: Promise<Validator>[] = [];
   for (let i = 0; i < validatorClientCount; i++) {
@@ -29,6 +31,7 @@ export async function getAndInitDevValidators({
     const tmpDir = tmp.dirSync({unsafeCleanup: true});
     vcs.push(
       Validator.initializeFromBeaconNode({
+        opts: validatorOpts,
         config: node.config,
         api: useRestApi ? getNodeApiUrl(node) : node.api,
         slashingProtection: new SlashingProtection({

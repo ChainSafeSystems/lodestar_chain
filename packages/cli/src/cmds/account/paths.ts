@@ -1,6 +1,7 @@
 import path from "path";
 import {IGlobalArgs} from "../../options";
 import {IGlobalPaths, getGlobalPaths} from "../../paths/global";
+import {IAccountPathOptions} from "@chainsafe/lodestar-validator";
 
 export interface IAccountPaths {
   keystoresDir: string;
@@ -33,14 +34,15 @@ export interface IAccountPaths {
  */
 // Using Pick<IGlobalArgs, "rootDir"> make changes in IGlobalArgs throw a type error here
 export function getAccountPaths(
-  args: Partial<IAccountPaths> & Pick<IGlobalArgs, "rootDir">
+  args: Partial<IAccountPaths> & Pick<IGlobalArgs, "rootDir">,
+  opts?: IAccountPathOptions
 ): IAccountPaths & IGlobalPaths {
   // Compute global paths first
   const globalPaths = getGlobalPaths(args);
 
   const rootDir = globalPaths.rootDir;
-  const keystoresDir = args.keystoresDir || path.join(rootDir, "keystores");
-  const secretsDir = args.secretsDir || path.join(rootDir, "secrets");
+  const keystoresDir = opts?.keystoresDir || args.keystoresDir || path.join(rootDir, "keystores");
+  const secretsDir = opts?.secretsDir || args.secretsDir || path.join(rootDir, "secrets");
   const walletsDir = args.walletsDir || path.join(rootDir, "wallets");
   return {
     ...globalPaths,

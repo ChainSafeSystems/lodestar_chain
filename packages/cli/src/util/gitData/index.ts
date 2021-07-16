@@ -1,5 +1,5 @@
 import {execSync} from "child_process";
-import {getLocalVersion} from "../version";
+import {getLocalVersion} from "@chainsafe/lodestar-utils";
 
 // This file is created in the build step and is distributed through NPM
 // MUST be in sync with packages/cli/src/gitData/gitDataPath.ts, and package.json .files
